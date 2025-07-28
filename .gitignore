@@ -9,6 +9,7 @@ dist/
 # Prisma
 prisma/dev.db
 prisma/dev.db-journal
+/src/generated/prisma/
 
 # Editor-specific files
 .idea/
@@ -25,3 +26,4 @@ logs/
 .env
 .env.*
 *.log
+

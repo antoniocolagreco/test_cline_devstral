@@ -6,11 +6,11 @@ The **Characters Archive API** is a RESTful CRUD service for managing character 
 
 ## 🔧 Technology Stack
 
-- **Runtime**: Node.js v20+
+- **Runtime**: Node.js v24+
 - **Framework**: Fastify v5+
 - **Language**: TypeScript
 - **ORM**: Prisma
-- **Database**: SQLite (dev/local)
+- **Database**: SQLite
 - **Package Manager**: pnpm
 - **Containerization**: Docker
 - **Linting**: ESLint + TypeScript rules
@@ -38,7 +38,9 @@ CharactersArchive/
 │   ├── schema.prisma         # Prisma schema definition
 │   └── migrations/           # Prisma migrations
 ├── dist/                     # Compiled JS (output)
-├── .eslintrc.json            # ESLint config
+├── eslint.config.js          # ESLint config
+├── prettier.config.js        # Prettier config
+├── jest.config.json          # Jest config
 ├── tsconfig.json             # TypeScript config
 ├── Dockerfile                # Docker build instructions
 ├── docker-compose.yml        # (optional) Container orchestration
@@ -47,10 +49,6 @@ CharactersArchive/
 ```
 
 ## 🔌 API Endpoints
-
-### Implemented
-
-- **GET /** – Welcome endpoint with metadata
 
 ### Planned Character Routes
 
@@ -62,6 +60,41 @@ CharactersArchive/
 | PUT    | /characters/:id | Update character by ID           |
 | PATCH  | /characters/:id | Partially update character by ID |
 | DELETE | /characters/:id | Delete character by ID           |
+
+| POST   | /authors              | Create a new author              |
+| GET    | /authors              | Retrieve all authors             |
+| GET    | /authors/:id          | Retrieve author by ID            |
+| PUT    | /authors/:id          | Update author by ID              |
+| PATCH  | /authors/:id          | Partially update author by ID    |
+| DELETE | /authors/:id          | Delete author by ID              |
+
+| POST   | /classes              | Create a new character class     |
+| GET    | /classes              | Retrieve all character classes   |
+| GET    | /classes/:id          | Retrieve character class by ID   |
+| PUT    | /classes/:id          | Update character class by ID     |
+| PATCH  | /classes/:id          | Partially update character class by ID |
+| DELETE | /classes/:id          | Delete character class by ID     |
+
+| POST   | /items                | Create a new character item      |
+| GET    | /items                | Retrieve all character items     |
+| GET    | /items/:id            | Retrieve character item by ID    |
+| PUT    | /items/:id            | Update character item by ID      |
+| PATCH  | /items/:id            | Partially update character item by ID |
+| DELETE | /items/:id            | Delete character item by ID      |
+
+| POST   | /races                | Create a new character race      |
+| GET    | /races                | Retrieve all character races     |
+| GET    | /races/:id            | Retrieve character race by ID    |
+| PUT    | /races/:id            | Update character race by ID      |
+| PATCH  | /races/:id            | Partially update character race by ID |
+| DELETE | /races/:id            | Delete character race by ID      |
+
+| POST   | /skills               | Create a new character skill     |
+| GET    | /skills               | Retrieve all character skills    |
+| GET    | /skills/:id           | Retrieve character skill by ID   |
+| PUT    | /skills/:id           | Update character skill by ID     |
+| PATCH  | /skills/:id           | Partially update character skill by ID |
+| DELETE | /skills/:id           | Delete character skill by ID     |
 
 ## 🧬 Database Schema
 
@@ -127,11 +160,3 @@ model Character {
 - Type-safe interfaces should be shared and validated at runtime.
 - SQLite is fine for local or small deployments — to be replaced by PostgreSQL in scalable environments.
 - Docker setup is intended for local dev, CI pipelines, and production builds.
-
-## 🎖 Future Enhancements (Optional)
-
-- JWT-based authentication (/login, /me)
-- Role-based access (admin, guest)
-- Pagination and filtering (GET /characters?limit=10&offset=0)
-- Unit and integration tests (Jest or Vitest)
-- CI/CD setup (GitHub Actions or similar)

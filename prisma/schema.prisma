@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum ItemType {
+  WEAPON
+  ARMOR
+  ACCESSORY
+}
+
+enum ItemRarity {
+  COMMON
+  UNCOMMON
+  RARE
+  EPIC
+  LEGENDARY
+}
+
+model CharacterAuthor {
+  id         Int         @id @default(autoincrement())
+  name       String
+  email      String
+  characters Character[]
+}
+
+model CharacterClass {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String?
+  characters  Character[]
+}
+
+model CharacterRace {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String?
+  characters  Character[]
+}
+
+model CharacterSkill {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String?
+  characters  Character[]
+}
+
+model CharacterItem {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String?
+  type        ItemType
+  rarity      ItemRarity
+  attack      Int
+  defense     Int
+  durability  Int
+  weight      Int
+  weaponUsers Character[] @relation("Weapon")
+  armorUsers  Character[] @relation("Armor")
+}
+
+model Character {
+  id           Int      @id @default(autoincrement())
+  name         String
+  surname      String?
+  nickname     String?
+  description  String?
+  health       Int
+  mana         Int
+  strength     Int
+  dexterity    Int
+  constitution Int
+  intelligence Int
+  wisdom       Int
+  charisma     Int
+  isPublic     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  authorId    Int
+  author      CharacterAuthor  @relation(fields: [authorId], references: [id])
+  classId     Int
+  class       CharacterClass   @relation(fields: [classId], references: [id])
+  raceId      Int
+  race        CharacterRace    @relation(fields: [raceId], references: [id])
+  weaponId    Int?
+  weapon      CharacterItem?   @relation("Weapon", fields: [weaponId], references: [id])
+  armorId     Int?
+  armor       CharacterItem?   @relation("Armor", fields: [armorId], references: [id])
+  accessories String?
+  skills      CharacterSkill[]
+}

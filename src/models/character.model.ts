@@ -1,4 +1,4 @@
-import type Author from './character-author'
+import type CharacterAuthor from './character-author'
 import type CharacterClass from './character-class.model'
 import type CharacterItem from './character-item.model'
 import type CharacterRace from './character-race.model'
@@ -22,9 +22,9 @@ export default interface Character {
     wisdom: number
     charisma: number
     weapon?: CharacterItem
-    armor?: string
-    accessories?: string
-    author: Author
+    armor?: CharacterItem
+    accessories?: CharacterItem[]
+    author: CharacterAuthor
     isPublic: boolean
     createdAt: Date
     updatedAt: Date

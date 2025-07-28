@@ -6,7 +6,7 @@ import unicorn from 'eslint-plugin-unicorn'
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
-    { ignores: ['dist/**'] },
+    { ignores: ['dist/**', 'src/generated/prisma/**'] },
     js.configs.recommended,
     {
         files: ['**/*.ts'],

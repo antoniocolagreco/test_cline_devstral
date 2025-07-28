@@ -1,90 +1,45 @@
 import { FastifyInstance } from 'fastify'
-import {
-    getAllCharacters,
-    getCharacterById,
-    createCharacter,
-    updateCharacter,
-    deleteCharacter,
-} from '../services/characterService'
-import { characterCreateSchema, characterUpdateSchema } from '../schemas/characterSchema'
-
-type IdParams = { id: string }
+import { prisma } from '../index.js'
 
 export default async function characterRoutes(server: FastifyInstance) {
-    // GET /characters - Retrieve all characters
     server.get('/', async (request, reply) => {
-        try {
-            const characters = await getAllCharacters()
-            reply.send(characters)
-        } catch (err) {
-            reply.status(500).send({ error: 'Internal server error' })
-        }
+        const characters = await prisma.character.findMany()
+        reply.send(characters)
     })
-
-    // GET /characters/:id - Retrieve character by ID
-    server.get<{ Params: IdParams }>('/:id', async (request, reply) => {
-        try {
-            const id = Number(request.params.id)
-            if (isNaN(id)) return reply.status(400).send({ error: 'Invalid ID' })
-            const character = await getCharacterById(id)
-            if (!character) return reply.status(404).send({ error: 'Character not found' })
-            reply.send(character)
-        } catch (err) {
-            reply.status(500).send({ error: 'Internal server error' })
-        }
+    server.get<{ Params: { id: string } }>('/:id', async (request, reply) => {
+        const character = await prisma.character.findUnique({ where: { id: Number(request.params.id) } })
+        if (!character) return reply.code(404).send({ error: 'Character not found' })
+        reply.send(character)
     })
-
-    // POST /characters - Create a new character
     server.post('/', async (request, reply) => {
-        try {
-            const parse = characterCreateSchema.safeParse(request.body)
-            if (!parse.success) return reply.status(400).send({ error: 'Invalid data', details: parse.error.errors })
-            const character = await createCharacter(parse.data)
-            reply.code(201).send(character)
-        } catch (err) {
-            reply.status(500).send({ error: 'Internal server error' })
-        }
+        const data = request.body as any
+        const character = await prisma.character.create({ data })
+        reply.code(201).send(character)
     })
-
-    // PUT /characters/:id - Update character by ID
-    server.put<{ Params: IdParams }>('/:id', async (request, reply) => {
+    server.put<{ Params: { id: string } }>('/:id', async (request, reply) => {
+        const data = request.body as any
         try {
-            const id = Number(request.params.id)
-            if (isNaN(id)) return reply.status(400).send({ error: 'Invalid ID' })
-            const parse = characterCreateSchema.safeParse(request.body)
-            if (!parse.success) return reply.status(400).send({ error: 'Invalid data', details: parse.error.errors })
-            const character = await updateCharacter(id, parse.data)
-            if (!character) return reply.status(404).send({ error: 'Character not found' })
+            const character = await prisma.character.update({ where: { id: Number(request.params.id) }, data })
             reply.send(character)
-        } catch (err) {
-            reply.status(500).send({ error: 'Internal server error' })
+        } catch {
+            reply.code(404).send({ error: 'Character not found' })
         }
     })
-
-    // PATCH /characters/:id - Partially update character by ID
-    server.patch<{ Params: IdParams }>('/:id', async (request, reply) => {
+    server.patch<{ Params: { id: string } }>('/:id', async (request, reply) => {
+        const data = request.body as any
         try {
-            const id = Number(request.params.id)
-            if (isNaN(id)) return reply.status(400).send({ error: 'Invalid ID' })
-            const parse = characterUpdateSchema.safeParse(request.body)
-            if (!parse.success) return reply.status(400).send({ error: 'Invalid data', details: parse.error.errors })
-            const character = await updateCharacter(id, parse.data)
-            if (!character) return reply.status(404).send({ error: 'Character not found' })
+            const character = await prisma.character.update({ where: { id: Number(request.params.id) }, data })
             reply.send(character)
-        } catch (err) {
-            reply.status(500).send({ error: 'Internal server error' })
+        } catch {
+            reply.code(404).send({ error: 'Character not found' })
         }
     })
-
-    // DELETE /characters/:id - Delete character by ID
-    server.delete<{ Params: IdParams }>('/:id', async (request, reply) => {
+    server.delete<{ Params: { id: string } }>('/:id', async (request, reply) => {
         try {
-            const id = Number(request.params.id)
-            if (isNaN(id)) return reply.status(400).send({ error: 'Invalid ID' })
-            await deleteCharacter(id)
+            await prisma.character.delete({ where: { id: Number(request.params.id) } })
             reply.code(204).send()
-        } catch (err) {
-            reply.status(500).send({ error: 'Internal server error' })
+        } catch {
+            reply.code(404).send({ error: 'Character not found' })
         }
     })
 }
