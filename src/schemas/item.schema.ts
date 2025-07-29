@@ -1,0 +1,48 @@
+import type { JSONSchemaType } from 'ajv'
+import type Item from '../models/item.model'
+
+// Fastify JSON Schema for Item input validation
+export const itemSchema: JSONSchemaType<Item> = {
+    type: 'object',
+    required: [
+        'id',
+        'name',
+        'rarity',
+        'weapon',
+        'armor',
+        'accessory',
+        'consumable',
+        'attack',
+        'defense',
+        'strength',
+        'dexterity',
+        'constitution',
+        'intelligence',
+        'wisdom',
+        'charisma',
+        'durability',
+        'weight',
+    ],
+    properties: {
+        id: { type: 'integer' },
+        name: { type: 'string', minLength: 1 },
+        description: { type: 'string', nullable: true },
+        tags: { type: 'array', items: { type: 'string' }, nullable: true },
+        rarity: { type: 'string' },
+        weapon: { type: 'boolean' },
+        armor: { type: 'boolean' },
+        accessory: { type: 'boolean' },
+        consumable: { type: 'boolean' },
+        attack: { type: 'integer' },
+        defense: { type: 'integer' },
+        strength: { type: 'integer' },
+        dexterity: { type: 'integer' },
+        constitution: { type: 'integer' },
+        intelligence: { type: 'integer' },
+        wisdom: { type: 'integer' },
+        charisma: { type: 'integer' },
+        durability: { type: 'integer' },
+        weight: { type: 'integer' },
+    },
+    additionalProperties: false,
+}

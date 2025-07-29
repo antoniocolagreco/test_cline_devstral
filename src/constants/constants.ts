@@ -1,3 +1,18 @@
-export type ItemRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
+/* eslint-disable no-unused-vars */
 
-export type CharacterAttribute = 'strength' | 'dexterity' | 'constitution' | 'intelligence' | 'wisdom' | 'charisma'
+export enum ItemRarity {
+    Common = 'common',
+    Uncommon = 'uncommon',
+    Rare = 'rare',
+    Epic = 'epic',
+    Legendary = 'legendary',
+}
+
+export enum CharacterAttribute {
+    Strength = 'strength',
+    Dexterity = 'dexterity',
+    Constitution = 'constitution',
+    Intelligence = 'intelligence',
+    Wisdom = 'wisdom',
+    Charisma = 'charisma',
+}

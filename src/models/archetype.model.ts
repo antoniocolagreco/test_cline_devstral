@@ -1,4 +1,4 @@
-import type { Skill } from '@prisma/client'
+import type Skill from './skill'
 
 export default interface Archetype {
     id: number

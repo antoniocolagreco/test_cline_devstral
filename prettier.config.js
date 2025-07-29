@@ -9,4 +9,5 @@ export default {
     trailingComma: 'all',
     bracketSpacing: true,
     arrowParens: 'always',
+    endOfLine: 'crlf',
 }
