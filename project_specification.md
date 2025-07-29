@@ -68,33 +68,33 @@ CharactersArchive/
 | PATCH  | /authors/:id          | Partially update author by ID    |
 | DELETE | /authors/:id          | Delete author by ID              |
 
-| POST   | /classes              | Create a new character class     |
-| GET    | /classes              | Retrieve all character classes   |
-| GET    | /classes/:id          | Retrieve character class by ID   |
-| PUT    | /classes/:id          | Update character class by ID     |
-| PATCH  | /classes/:id          | Partially update character class by ID |
-| DELETE | /classes/:id          | Delete character class by ID     |
+| POST   | /archetypes              | Create a new archetype     |
+| GET    | /archetypes              | Retrieve all archetypes   |
+| GET    | /archetypes/:id          | Retrieve archetype by ID   |
+| PUT    | /archetypes/:id          | Update archetype by ID     |
+| PATCH  | /archetypes/:id          | Partially update archetype by ID |
+| DELETE | /archetypes/:id          | Delete archetype by ID     |
 
-| POST   | /items                | Create a new character item      |
-| GET    | /items                | Retrieve all character items     |
-| GET    | /items/:id            | Retrieve character item by ID    |
-| PUT    | /items/:id            | Update character item by ID      |
-| PATCH  | /items/:id            | Partially update character item by ID |
-| DELETE | /items/:id            | Delete character item by ID      |
+| POST   | /items                | Create a new item      |
+| GET    | /items                | Retrieve all items     |
+| GET    | /items/:id            | Retrieve item by ID    |
+| PUT    | /items/:id            | Update item by ID      |
+| PATCH  | /items/:id            | Partially update item by ID |
+| DELETE | /items/:id            | Delete item by ID      |
 
-| POST   | /races                | Create a new character race      |
-| GET    | /races                | Retrieve all character races     |
-| GET    | /races/:id            | Retrieve character race by ID    |
-| PUT    | /races/:id            | Update character race by ID      |
-| PATCH  | /races/:id            | Partially update character race by ID |
-| DELETE | /races/:id            | Delete character race by ID      |
+| POST   | /races                | Create a new race      |
+| GET    | /races                | Retrieve all races     |
+| GET    | /races/:id            | Retrieve race by ID    |
+| PUT    | /races/:id            | Update race by ID      |
+| PATCH  | /races/:id            | Partially update race by ID |
+| DELETE | /races/:id            | Delete race by ID      |
 
-| POST   | /skills               | Create a new character skill     |
-| GET    | /skills               | Retrieve all character skills    |
-| GET    | /skills/:id           | Retrieve character skill by ID   |
-| PUT    | /skills/:id           | Update character skill by ID     |
-| PATCH  | /skills/:id           | Partially update character skill by ID |
-| DELETE | /skills/:id           | Delete character skill by ID     |
+| POST   | /skills               | Create a new skill     |
+| GET    | /skills               | Retrieve all skills    |
+| GET    | /skills/:id           | Retrieve skill by ID   |
+| PUT    | /skills/:id           | Update skill by ID     |
+| PATCH  | /skills/:id           | Partially update skill by ID |
+| DELETE | /skills/:id           | Delete skill by ID     |
 
 ## 🧬 Database Schema
 

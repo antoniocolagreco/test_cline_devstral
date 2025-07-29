@@ -1,8 +1,7 @@
 import process from 'process'
 
-import fastify from 'fastify'
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import { PrismaClient } from '@prisma/client'
+import fastify, { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 
 // Initialize Fastify server
 const server: FastifyInstance = fastify({
@@ -12,7 +11,7 @@ const server: FastifyInstance = fastify({
 // Initialize Prisma client
 const prisma = new PrismaClient()
 
-export { server, prisma }
+export { prisma, server }
 
 // Register routes
 async function registerRoutes(server: FastifyInstance) {
@@ -25,8 +24,8 @@ async function registerRoutes(server: FastifyInstance) {
     server.register(authorRoutes.default, { prefix: '/authors' })
 
     // Import and register class routes
-    const classRoutes = await import('./routes/classes.js')
-    server.register(classRoutes.default, { prefix: '/classes' })
+    const archetypesRoutes = await import('./routes/archetypes.js')
+    server.register(archetypesRoutes.default, { prefix: '/classes' })
 
     // Import and register item routes
     const itemRoutes = await import('./routes/items.js')

@@ -1,97 +1,130 @@
+// Prisma schema generated from TypeScript models in src/models
+// Datasource and generator
+
 generator client {
-  provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+    provider = "sqlite"
+    url      = env("DATABASE_URL")
 }
 
-enum ItemType {
-  WEAPON
-  ARMOR
-  ACCESSORY
+model Author {
+    id         Int         @id @default(autoincrement())
+    name       String
+    email      String      @unique
+    characters Character[]
+}
+
+model Skill {
+    id          Int         @id @default(autoincrement())
+    name        String
+    description String?
+    archetypes  Archetype[] @relation("ArchetypeSkills")
+    races       Race[]      @relation("RaceSkills")
+}
+
+model Archetype {
+    id          Int         @id @default(autoincrement())
+    name        String
+    description String?
+    skills      Skill[]     @relation("ArchetypeSkills")
+    characters  Character[]
+}
+
+model Race {
+    id                   Int         @id @default(autoincrement())
+    name                 String
+    description          String?
+    skills               Skill[]     @relation("RaceSkills")
+    healthModifier       Int
+    manaModifier         Int
+    strengthModifier     Int
+    dexterityModifier    Int
+    constitutionModifier Int
+    intelligenceModifier Int
+    wisdomModifier       Int
+    charismaModifier     Int
+    characters           Character[]
 }
 
 enum ItemRarity {
-  COMMON
-  UNCOMMON
-  RARE
-  EPIC
-  LEGENDARY
+    common
+    uncommon
+    rare
+    epic
+    legendary
 }
 
-model CharacterAuthor {
-  id         Int         @id @default(autoincrement())
-  name       String
-  email      String
-  characters Character[]
-}
-
-model CharacterClass {
-  id          Int         @id @default(autoincrement())
-  name        String
-  description String?
-  characters  Character[]
-}
-
-model CharacterRace {
-  id          Int         @id @default(autoincrement())
-  name        String
-  description String?
-  characters  Character[]
-}
-
-model CharacterSkill {
-  id          Int         @id @default(autoincrement())
-  name        String
-  description String?
-  characters  Character[]
-}
-
-model CharacterItem {
-  id          Int         @id @default(autoincrement())
-  name        String
-  description String?
-  type        ItemType
-  rarity      ItemRarity
-  attack      Int
-  defense     Int
-  durability  Int
-  weight      Int
-  weaponUsers Character[] @relation("Weapon")
-  armorUsers  Character[] @relation("Armor")
+model Item {
+    id                 Int         @id @default(autoincrement())
+    name               String
+    description        String?
+    // tags        String[] // Not supported in SQLite/Prisma
+    // Equipment slots (reverse relations)
+    primaryWeaponFor   Character[] @relation("PrimaryWeapon")
+    secondaryWeaponFor Character[] @relation("SecondaryWeapon")
+    shieldFor          Character[] @relation("Shield")
+    armorFor           Character[] @relation("Armor")
+    firstRingFor       Character[] @relation("FirstRing")
+    secondRingFor      Character[] @relation("SecondRing")
+    amuletFor          Character[] @relation("Amulet")
+    rarity             ItemRarity
+    weapon             Boolean
+    armor              Boolean
+    accessory          Boolean
+    consumable         Boolean
+    attack             Int
+    defense            Int
+    strength           Int
+    dexterity          Int
+    constitution       Int
+    intelligence       Int
+    wisdom             Int
+    charisma           Int
+    durability         Int
+    weight             Int
+    characters         Character[] @relation("CharacterItems")
 }
 
 model Character {
-  id           Int      @id @default(autoincrement())
-  name         String
-  surname      String?
-  nickname     String?
-  description  String?
-  health       Int
-  mana         Int
-  strength     Int
-  dexterity    Int
-  constitution Int
-  intelligence Int
-  wisdom       Int
-  charisma     Int
-  isPublic     Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  authorId    Int
-  author      CharacterAuthor  @relation(fields: [authorId], references: [id])
-  classId     Int
-  class       CharacterClass   @relation(fields: [classId], references: [id])
-  raceId      Int
-  race        CharacterRace    @relation(fields: [raceId], references: [id])
-  weaponId    Int?
-  weapon      CharacterItem?   @relation("Weapon", fields: [weaponId], references: [id])
-  armorId     Int?
-  armor       CharacterItem?   @relation("Armor", fields: [armorId], references: [id])
-  accessories String?
-  skills      CharacterSkill[]
+    id                Int       @id @default(autoincrement())
+    name              String
+    surname           String?
+    nickname          String?
+    description       String?
+    avatar            String?
+    health            Int
+    mana              Int
+    strength          Int
+    dexterity         Int
+    constitution      Int
+    intelligence      Int
+    wisdom            Int
+    charisma          Int
+    raceId            Int
+    race              Race      @relation(fields: [raceId], references: [id])
+    archetypeId       Int
+    archetype         Archetype @relation(fields: [archetypeId], references: [id])
+    items             Item[]    @relation("CharacterItems")
+    primaryWeaponId   Int?
+    primaryWeapon     Item?     @relation("PrimaryWeapon", fields: [primaryWeaponId], references: [id])
+    secondaryWeaponId Int?
+    secondaryWeapon   Item?     @relation("SecondaryWeapon", fields: [secondaryWeaponId], references: [id])
+    shieldId          Int?
+    shield            Item?     @relation("Shield", fields: [shieldId], references: [id])
+    armorId           Int?
+    armor             Item?     @relation("Armor", fields: [armorId], references: [id])
+    firstRingId       Int?
+    firstRing         Item?     @relation("FirstRing", fields: [firstRingId], references: [id])
+    secondRingId      Int?
+    secondRing        Item?     @relation("SecondRing", fields: [secondRingId], references: [id])
+    amuletId          Int?
+    amulet            Item?     @relation("Amulet", fields: [amuletId], references: [id])
+    authorId          Int
+    author            Author    @relation(fields: [authorId], references: [id])
+    isPublic          Boolean
+    createdAt         DateTime  @default(now())
+    updatedAt         DateTime  @updatedAt
 }
