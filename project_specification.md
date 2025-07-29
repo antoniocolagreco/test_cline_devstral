@@ -2,161 +2,97 @@
 
 ## 🧾 Project Overview
 
-The **Characters Archive API** is a RESTful CRUD service for managing character data, designed with maintainability, scalability, and developer ergonomics in mind.
+The **Characters Archive API** is a RESTful CRUD service for managing character data, designed for maintainability, scalability, and developer ergonomics. It leverages modern technologies to ensure robust development and deployment workflows.
 
-## 🔧 Technology Stack
+## 🔧 Technology Stack Explained
 
-- **Runtime**: Node.js v24+
-- **Framework**: Fastify v5+
-- **Language**: TypeScript
-- **ORM**: Prisma
-- **Database**: SQLite
-- **Package Manager**: pnpm
-- **Containerization**: Docker
-- **Linting**: ESLint + TypeScript rules
-- **Formatting**: Prettier
-- **Typing Support**: TypeScript types
+- **Node.js v24+**: The JavaScript runtime powering the backend, chosen for its performance and ecosystem.
+- **TypeScript**: Adds static typing to JavaScript, improving code quality and maintainability.
+- **Fastify v5+**: The web framework used for building the API. Fastify is lightweight, fast, and provides built-in schema validation for requests and responses.
+- **Prisma ORM**: An advanced ORM for TypeScript/Node.js, used to define models and interact with the database in a type-safe way.
+- **SQLite**: The default database for local development. It is file-based and easy to set up. For production, you can switch to PostgreSQL or another supported database.
+- **pnpm**: A fast, disk-efficient package manager for Node.js projects.
+- **Docker**: Used for containerizing the application, ensuring consistency across development, CI, and production environments.
+- **ESLint**: A linter for JavaScript/TypeScript, enforcing code quality and style rules.
+- **Prettier**: An opinionated code formatter for consistent code style.
+- **Jest**: The testing framework for unit and integration tests.
+- **Swagger (via @fastify/swagger)**: Automatically generates OpenAPI documentation and exposes a Swagger UI for API exploration.
 
-> **Note**: SQLite is used for simplicity in development; can be swapped with PostgreSQL for production scenarios.
+## 🗂️ Project Structure Overview
 
----
+The project is organized for clarity and scalability:
 
-## 📁 Project Structure
+- `src/index.ts`: Fastify server entrypoint.
+- `src/routes/`: HTTP route handlers for each resource (characters, authors, etc.).
+- `src/controllers/`: Business logic layer, separating route logic from core operations.
+- `src/constants/`: Shared enums and constants.
+- `src/models/`: Prisma models (generated from schema).
+- `src/schemas/`: JSON schemas for input validation (used by Fastify).
+- `src/services/`: Database access abstraction, e.g., characterService.ts.
+- `src/utils/`: Helpers and common logic.
+- `prisma/schema.prisma`: Prisma schema definition.
+- `prisma/migrations/`: Prisma migration files.
+- `dist/`: Compiled JS output.
+- `Dockerfile` & `docker-compose.yml`: Containerization and orchestration.
+- `eslint.config.js`, `prettier.config.js`, `jest.config.json`, `tsconfig.json`: Tooling configs.
+- `package.json`: Scripts and dependencies.
+- `README.md`: Project documentation.
 
-```plaintext
-CharactersArchive/
-├── src/
-│   ├── index.ts              # Fastify server entrypoint
-│   ├── routes/               # HTTP route handlers
-│   ├── controllers/          # Business logic layer
-│   ├── constants/            # Enum e costanti condivise
-│   ├── models/               # Prisma models (generated)
-│   ├── schemas/              # Input validation schemas
-│   ├── services/             # Database access abstraction
-│   └── utils/                # Helpers and common logic
-├── prisma/
-│   ├── schema.prisma         # Prisma schema definition
-│   └── migrations/           # Prisma migrations
-├── dist/                     # Compiled JS (output)
-├── eslint.config.js          # ESLint config
-├── prettier.config.js        # Prettier config
-├── jest.config.json          # Jest config
-├── tsconfig.json             # TypeScript config
-├── Dockerfile                # Docker build instructions
-├── docker-compose.yml        # (optional) Container orchestration
-├── package.json              # Scripts and dependencies
-└── README.md                 # Project documentation
-```
+## � Implementation Roadmap (Recommended Order)
 
-## 🔌 API Endpoints
+1. **Initialize Project & Tooling**
+   - Set up a new Node.js project with pnpm.
+   - Configure TypeScript (`tsconfig.json`).
+   - Add ESLint and Prettier for code quality and formatting.
+   - Set up Jest for testing.
 
-### Planned Character Routes
+2. **Database & ORM Setup**
+   - Define models in `prisma/schema.prisma`.
+   - Run `npx prisma migrate dev` to create the initial database and migrations.
+   - Generate Prisma client.
 
-| Method | Endpoint        | Description                      |
-| ------ | --------------- | -------------------------------- |
-| POST   | /characters     | Create a new character           |
-| GET    | /characters     | Retrieve all characters          |
-| GET    | /characters/:id | Retrieve character by ID         |
-| PUT    | /characters/:id | Update character by ID           |
-| PATCH  | /characters/:id | Partially update character by ID |
-| DELETE | /characters/:id | Delete character by ID           |
+3. **Fastify Server & Routing**
+   - Create `src/index.ts` to initialize Fastify.
+   - Implement route files in `src/routes/` for each resource (characters, authors, etc.).
+   - Use Fastify's built-in schema validation for all endpoints.
 
-| POST   | /authors              | Create a new author              |
-| GET    | /authors              | Retrieve all authors             |
-| GET    | /authors/:id          | Retrieve author by ID            |
-| PUT    | /authors/:id          | Update author by ID              |
-| PATCH  | /authors/:id          | Partially update author by ID    |
-| DELETE | /authors/:id          | Delete author by ID              |
+4. **Business Logic & Services**
+   - Implement controllers in `src/controllers/` to handle business logic.
+   - Abstract database access in `src/services/` (e.g., characterService.ts).
 
-| POST   | /archetypes              | Create a new archetype     |
-| GET    | /archetypes              | Retrieve all archetypes   |
-| GET    | /archetypes/:id          | Retrieve archetype by ID   |
-| PUT    | /archetypes/:id          | Update archetype by ID     |
-| PATCH  | /archetypes/:id          | Partially update archetype by ID |
-| DELETE | /archetypes/:id          | Delete archetype by ID     |
+5. **Validation & Schemas**
+   - Define JSON schemas for requests and responses in `src/schemas/`.
+   - Integrate schemas with Fastify route definitions.
 
-| POST   | /items                | Create a new item      |
-| GET    | /items                | Retrieve all items     |
-| GET    | /items/:id            | Retrieve item by ID    |
-| PUT    | /items/:id            | Update item by ID      |
-| PATCH  | /items/:id            | Partially update item by ID |
-| DELETE | /items/:id            | Delete item by ID      |
+6. **Testing**
+   - Write unit and integration tests using Jest.
+   - Ensure coverage for routes, controllers, and services.
 
-| POST   | /races                | Create a new race      |
-| GET    | /races                | Retrieve all races     |
-| GET    | /races/:id            | Retrieve race by ID    |
-| PUT    | /races/:id            | Update race by ID      |
-| PATCH  | /races/:id            | Partially update race by ID |
-| DELETE | /races/:id            | Delete race by ID      |
+7. **Documentation**
+   - Integrate @fastify/swagger for OpenAPI docs.
+   - Expose Swagger UI at `/docs` endpoint.
 
-| POST   | /skills               | Create a new skill     |
-| GET    | /skills               | Retrieve all skills    |
-| GET    | /skills/:id           | Retrieve skill by ID   |
-| PUT    | /skills/:id           | Update skill by ID     |
-| PATCH  | /skills/:id           | Partially update skill by ID |
-| DELETE | /skills/:id           | Delete skill by ID     |
+8. **Dockerization**
+   - Create a `Dockerfile` for building the app image.
+   - Optionally add `docker-compose.yml` for multi-service orchestration.
 
-## 🧬 Database Schema
+9. **CI/CD & Quality Assurance**
+   - Add scripts for linting, formatting, and testing in `package.json`.
+   - Ensure ESLint and Prettier are enforced in CI pipelines.
 
-```typescript
-// src/models/index.ts
-/**
- * Character model definition.
- */
-model Character {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-```
+10. **Production Readiness**
+    - Switch database to PostgreSQL if scaling is needed.
+    - Review security, performance, and deployment best practices.
 
-- The schema is defined in `prisma/schema.prisma`.
-- Use `npx prisma migrate dev` to manage migrations.
-- Data access is abstracted using a service layer (`src/services/characterService.ts`).
+## 🔌 API Endpoints Overview
 
-## 🚀 Implementation Roadmap
+The API exposes RESTful CRUD endpoints for the following resources:
 
-### Setup
+- **Characters**: `/characters`, `/characters/:id`
+- **Authors**: `/authors`, `/authors/:id`
+- **Archetypes**: `/archetypes`, `/archetypes/:id`
+- **Items**: `/items`, `/items/:id`
+- **Races**: `/races`, `/races/:id`
+- **Skills**: `/skills`, `/skills/:id`
 
-1. Initialize Fastify with TypeScript and tsconfig.
-2. Install and configure ESLint with sensible defaults.
-
-### Database Integration
-
-1. Define schema with Prisma.
-2. Implement SQLite for local development.
-
-### CRUD API
-
-1. Implement routes with validation and error handling.
-
-### Dockerization
-
-1. Create Dockerfile and optionally docker-compose.yml.
-2. Ensure local and production consistency.
-
-### Documentation
-
-1. Add OpenAPI documentation (via @fastify/swagger).
-2. Expose Swagger UI at `/docs`.
-
-## ✅ Linting & Quality
-
-- ESLint configured with TypeScript and Fastify rules.
-- Key rules:
-  - no-unused-vars
-  - eqeqeq
-  - quotes ('single')
-  - prefer-const
-
-- Optional: Prettier integration for formatting.
-- CI-ready with `eslint . --ext .ts` script.
-
-## 📌 Notes
-
-- The API should follow RESTful conventions.
-- Type-safe interfaces should be shared and validated at runtime.
-- SQLite is fine for local or small deployments — to be replaced by PostgreSQL in scalable environments.
-- Docker setup is intended for local dev, CI pipelines, and production builds.
+Each resource supports standard CRUD operations: Create (POST), Read (GET), Update (PUT/PATCH), and Delete (DELETE).
