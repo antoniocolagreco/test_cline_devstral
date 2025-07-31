@@ -35,9 +35,10 @@ const GetSkillParamsSchema = Type.Object(
 	{ additionalProperties: false },
 )
 
-export type GetSkill = Static<typeof GetSkillSchema>
-export type CreateSkill = Static<typeof CreateSkillSchema>
-export type UpdateSkill = Static<typeof UpdateSkillSchema>
-export type GetSkillParams = Static<typeof GetSkillParamsSchema>
+type GetSkill = Static<typeof GetSkillSchema>
+type CreateSkill = Static<typeof CreateSkillSchema>
+type UpdateSkill = Static<typeof UpdateSkillSchema>
+type GetSkillParams = Static<typeof GetSkillParamsSchema>
 
-export { GetSkillSchema, CreateSkillSchema, UpdateSkillSchema, GetSkillParamsSchema }
+export { CreateSkillSchema, GetSkillParamsSchema, GetSkillSchema, UpdateSkillSchema }
+export type { CreateSkill, GetSkill, GetSkillParams, UpdateSkill }

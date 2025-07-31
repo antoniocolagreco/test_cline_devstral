@@ -62,9 +62,10 @@ const GetRaceParamsSchema = Type.Object(
 	{ additionalProperties: false },
 )
 
-export type GetRace = Static<typeof GetRaceSchema>
-export type CreateRace = Static<typeof CreateRaceSchema>
-export type UpdateRace = Static<typeof UpdateRaceSchema>
-export type GetRaceParams = Static<typeof GetRaceParamsSchema>
+type GetRace = Static<typeof GetRaceSchema>
+type CreateRace = Static<typeof CreateRaceSchema>
+type UpdateRace = Static<typeof UpdateRaceSchema>
+type GetRaceParams = Static<typeof GetRaceParamsSchema>
 
-export { GetRaceSchema, CreateRaceSchema, UpdateRaceSchema, GetRaceParamsSchema }
+export { CreateRaceSchema, GetRaceParamsSchema, GetRaceSchema, UpdateRaceSchema }
+export type { CreateRace, GetRace, GetRaceParams, UpdateRace }

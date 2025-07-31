@@ -1,3 +1,4 @@
+import ItemRarity from '@/constants/item-rarity.constant'
 import { Type, Static } from '@sinclair/typebox'
 
 const GetItemSchema = Type.Object(
@@ -5,7 +6,7 @@ const GetItemSchema = Type.Object(
 		id: Type.Integer(),
 		name: Type.String({ minLength: 1, maxLength: 100 }),
 		description: Type.Optional(Type.String({ maxLength: 500 })),
-		rarity: Type.String({ enum: ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary'] }),
+		rarity: Type.Enum(ItemRarity),
 		isWeapon: Type.Boolean(),
 		isShield: Type.Boolean(),
 		isArmor: Type.Boolean(),
@@ -41,7 +42,7 @@ const CreateItemSchema = Type.Object(
 	{
 		name: Type.String({ minLength: 1, maxLength: 100 }),
 		description: Type.Optional(Type.String({ maxLength: 500 })),
-		rarity: Type.String({ enum: ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary'] }),
+		rarity: Type.Enum(ItemRarity),
 		isWeapon: Type.Boolean(),
 		isShield: Type.Boolean(),
 		isArmor: Type.Boolean(),
@@ -113,9 +114,10 @@ const GetItemParamsSchema = Type.Object(
 	{ additionalProperties: false },
 )
 
-export type GetItem = Static<typeof GetItemSchema>
-export type CreateItem = Static<typeof CreateItemSchema>
-export type UpdateItem = Static<typeof UpdateItemSchema>
-export type GetItemParams = Static<typeof GetItemParamsSchema>
+type GetItem = Static<typeof GetItemSchema>
+type CreateItem = Static<typeof CreateItemSchema>
+type UpdateItem = Static<typeof UpdateItemSchema>
+type GetItemParams = Static<typeof GetItemParamsSchema>
 
-export { GetItemSchema, CreateItemSchema, UpdateItemSchema, GetItemParamsSchema }
+export { CreateItemSchema, GetItemParamsSchema, GetItemSchema, UpdateItemSchema }
+export type { CreateItem, GetItem, GetItemParams, UpdateItem }

@@ -1,4 +1,4 @@
-import { Type, Static } from '@sinclair/typebox'
+import { Static, Type } from '@sinclair/typebox'
 
 const GetArchetypeSchema = Type.Object(
 	{
@@ -35,9 +35,10 @@ const GetArchetypeParamsSchema = Type.Object(
 	{ additionalProperties: false },
 )
 
-export type GetArchetype = Static<typeof GetArchetypeSchema>
-export type CreateArchetype = Static<typeof CreateArchetypeSchema>
-export type UpdateArchetype = Static<typeof UpdateArchetypeSchema>
-export type GetArchetypeParams = Static<typeof GetArchetypeParamsSchema>
+type GetArchetype = Static<typeof GetArchetypeSchema>
+type CreateArchetype = Static<typeof CreateArchetypeSchema>
+type UpdateArchetype = Static<typeof UpdateArchetypeSchema>
+type GetArchetypeParams = Static<typeof GetArchetypeParamsSchema>
 
-export { GetArchetypeSchema, CreateArchetypeSchema, UpdateArchetypeSchema, GetArchetypeParamsSchema }
+export { CreateArchetypeSchema, GetArchetypeParamsSchema, GetArchetypeSchema, UpdateArchetypeSchema }
+export type { CreateArchetype, GetArchetype, GetArchetypeParams, UpdateArchetype }

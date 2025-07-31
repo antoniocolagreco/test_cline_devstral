@@ -48,9 +48,10 @@ const GetUserParamsSchema = Type.Object(
 	{ additionalProperties: false },
 )
 
-export type GetUser = Static<typeof GetUserSchema>
-export type CreateUser = Static<typeof CreateUserSchema>
-export type UpdateUser = Static<typeof UpdateUserSchema>
-export type GetUserParams = Static<typeof GetUserParamsSchema>
+type GetUser = Static<typeof GetUserSchema>
+type CreateUser = Static<typeof CreateUserSchema>
+type UpdateUser = Static<typeof UpdateUserSchema>
+type GetUserParams = Static<typeof GetUserParamsSchema>
 
-export { GetUserSchema, CreateUserSchema, UpdateUserSchema, GetUserParamsSchema }
+export { CreateUserSchema, GetUserParamsSchema, GetUserSchema, UpdateUserSchema }
+export type { CreateUser, GetUser, GetUserParams, UpdateUser }

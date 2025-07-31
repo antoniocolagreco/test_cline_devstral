@@ -19,9 +19,9 @@ type GetManyService<T> = (params: GetManyQueryParams<T>) => Promise<GetManyResul
 
 type GetOneService<T> = (id: number) => Promise<T | null>
 
-type CreateService<T> = (data: T) => Promise<T>
+type CreateService<T, R> = (data: T) => Promise<R>
 
-type UpdateService<T> = (data: T) => Promise<T | null>
+type UpdateService<T, R> = (data: T) => Promise<R | null>
 
 type DeleteService = (id: number) => Promise<void>
 

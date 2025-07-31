@@ -30,10 +30,7 @@ interface TagParams {
 /**
  * Controller for getting multiple tags with pagination, filtering, and search
  */
-export const getTagsController = async (
-	request: FastifyRequest<{ Querystring: GetTagsQuerystring }>,
-	reply: FastifyReply,
-) => {
+const getTagsController = async (request: FastifyRequest<{ Querystring: GetTagsQuerystring }>, reply: FastifyReply) => {
 	try {
 		const result = await getTagsService(request.query)
 
@@ -59,7 +56,7 @@ export const getTagsController = async (
 /**
  * Controller for getting a single tag by ID
  */
-export const getTagController = async (request: FastifyRequest<{ Params: TagParams }>, reply: FastifyReply) => {
+const getTagController = async (request: FastifyRequest<{ Params: TagParams }>, reply: FastifyReply) => {
 	try {
 		const id = parseInt(request.params.id, 10)
 
@@ -98,7 +95,7 @@ export const getTagController = async (request: FastifyRequest<{ Params: TagPara
 /**
  * Controller for creating a new tag
  */
-export const createTagController = async (request: FastifyRequest<{ Body: CreateTagBody }>, reply: FastifyReply) => {
+const createTagController = async (request: FastifyRequest<{ Body: CreateTagBody }>, reply: FastifyReply) => {
 	try {
 		const tag = await createTagService(request.body)
 
@@ -130,7 +127,7 @@ export const createTagController = async (request: FastifyRequest<{ Body: Create
 /**
  * Controller for updating an existing tag
  */
-export const updateTagController = async (
+const updateTagController = async (
 	request: FastifyRequest<{ Params: TagParams; Body: UpdateTagBody }>,
 	reply: FastifyReply,
 ) => {
@@ -180,7 +177,7 @@ export const updateTagController = async (
 /**
  * Controller for deleting a tag by ID
  */
-export const deleteTagController = async (request: FastifyRequest<{ Params: TagParams }>, reply: FastifyReply) => {
+const deleteTagController = async (request: FastifyRequest<{ Params: TagParams }>, reply: FastifyReply) => {
 	try {
 		const id = parseInt(request.params.id, 10)
 
@@ -221,3 +218,5 @@ export const deleteTagController = async (request: FastifyRequest<{ Params: TagP
 		})
 	}
 }
+
+export { getTagsController, getTagController, createTagController, updateTagController, deleteTagController }

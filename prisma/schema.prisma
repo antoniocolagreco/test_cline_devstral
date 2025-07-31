@@ -1,6 +1,3 @@
-// Prisma schema for Fantasy Character Management System API
-// Datasource and generator
-
 generator client {
     provider = "prisma-client-js"
 }
@@ -12,12 +9,12 @@ datasource db {
 
 model User {
     id          Int         @id @default(autoincrement())
-    name        String // max 50 characters validated at application level
+    name        String
     email       String      @unique
-    password    String? // Hashed with bcrypt, nullable for OAuth users
-    googleId    String?     @unique // OAuth Google ID
-    githubId    String?     @unique // OAuth GitHub ID  
-    discordId   String?     @unique // OAuth Discord ID
+    password    String?
+    googleId    String?     @unique
+    githubId    String?     @unique
+    discordId   String?     @unique
     avatarPath  String?
     isVerified  Boolean     @default(false)
     isActive    Boolean     @default(true)
@@ -55,8 +52,8 @@ model Archetype {
     description String?
     createdAt   DateTime    @default(now())
     updatedAt   DateTime    @updatedAt
-    skills      Skill[]     @relation("ArchetypeSkills")
     characters  Character[]
+    skills      Skill[]     @relation("ArchetypeSkills")
     tags        Tag[]       @relation("ArchetypeTags")
 
     @@index([name])
@@ -78,20 +75,12 @@ model Race {
     charismaModifier     Int         @default(0)
     createdAt            DateTime    @default(now())
     updatedAt            DateTime    @updatedAt
-    skills               Skill[]     @relation("RaceSkills")
     characters           Character[]
+    skills               Skill[]     @relation("RaceSkills")
     tags                 Tag[]       @relation("RaceTags")
 
     @@index([name])
     @@map("races")
-}
-
-enum ItemRarity {
-    Common
-    Uncommon
-    Rare
-    Epic
-    Legendary
 }
 
 model Tag {
@@ -99,11 +88,11 @@ model Tag {
     name       String      @unique
     createdAt  DateTime    @default(now())
     updatedAt  DateTime    @updatedAt
-    items      Item[]      @relation("ItemTags")
-    characters Character[] @relation("CharacterTags")
-    skills     Skill[]     @relation("SkillTags")
     archetypes Archetype[] @relation("ArchetypeTags")
+    characters Character[] @relation("CharacterTags")
+    items      Item[]      @relation("ItemTags")
     races      Race[]      @relation("RaceTags")
+    skills     Skill[]     @relation("SkillTags")
 
     @@index([name])
     @@map("tags")
@@ -141,13 +130,13 @@ model Item {
     weight               Int         @default(1)
     createdAt            DateTime    @default(now())
     updatedAt            DateTime    @updatedAt
-    primaryWeaponFor     Character[] @relation("PrimaryWeapon")
-    secondaryWeaponFor   Character[] @relation("SecondaryWeapon")
-    shieldFor            Character[] @relation("Shield")
-    armorFor             Character[] @relation("Armor")
-    firstRingFor         Character[] @relation("FirstRing")
-    secondRingFor        Character[] @relation("SecondRing")
     amuletFor            Character[] @relation("Amulet")
+    secondRingFor        Character[] @relation("SecondRing")
+    firstRingFor         Character[] @relation("FirstRing")
+    armorFor             Character[] @relation("Armor")
+    shieldFor            Character[] @relation("Shield")
+    secondaryWeaponFor   Character[] @relation("SecondaryWeapon")
+    primaryWeaponFor     Character[] @relation("PrimaryWeapon")
     characters           Character[] @relation("CharacterItems")
     tags                 Tag[]       @relation("ItemTags")
 
@@ -179,26 +168,26 @@ model Character {
     createdAt         DateTime  @default(now())
     updatedAt         DateTime  @updatedAt
     raceId            Int
-    race              Race      @relation(fields: [raceId], references: [id])
     archetypeId       Int
-    archetype         Archetype @relation(fields: [archetypeId], references: [id])
-    userId            Int       @map(" userId")
-    user              User      @relation(fields: [userId], references: [id])
-    items             Item[]    @relation("CharacterItems")
+    userId            Int
     primaryWeaponId   Int?
-    primaryWeapon     Item?     @relation("PrimaryWeapon", fields: [primaryWeaponId], references: [id])
     secondaryWeaponId Int?
-    secondaryWeapon   Item?     @relation("SecondaryWeapon", fields: [secondaryWeaponId], references: [id])
     shieldId          Int?
-    shield            Item?     @relation("Shield", fields: [shieldId], references: [id])
     armorId           Int?
-    armor             Item?     @relation("Armor", fields: [armorId], references: [id])
     firstRingId       Int?
-    firstRing         Item?     @relation("FirstRing", fields: [firstRingId], references: [id])
     secondRingId      Int?
-    secondRing        Item?     @relation("SecondRing", fields: [secondRingId], references: [id])
     amuletId          Int?
     amulet            Item?     @relation("Amulet", fields: [amuletId], references: [id])
+    secondRing        Item?     @relation("SecondRing", fields: [secondRingId], references: [id])
+    firstRing         Item?     @relation("FirstRing", fields: [firstRingId], references: [id])
+    armor             Item?     @relation("Armor", fields: [armorId], references: [id])
+    shield            Item?     @relation("Shield", fields: [shieldId], references: [id])
+    secondaryWeapon   Item?     @relation("SecondaryWeapon", fields: [secondaryWeaponId], references: [id])
+    primaryWeapon     Item?     @relation("PrimaryWeapon", fields: [primaryWeaponId], references: [id])
+    user              User      @relation(fields: [userId], references: [id])
+    archetype         Archetype @relation(fields: [archetypeId], references: [id])
+    race              Race      @relation(fields: [raceId], references: [id])
+    items             Item[]    @relation("CharacterItems")
     tags              Tag[]     @relation("CharacterTags")
 
     @@index([name])
@@ -207,7 +196,7 @@ model Character {
     @@index([archetypeId])
     @@index([isPublic])
     @@index([createdAt])
-    @@index([userId, isPublic]) // Composite index for filtering characters by user and visibility
+    @@index([userId, isPublic])
     @@map("characters")
 }
 
@@ -221,6 +210,7 @@ model Image {
     mimeType  String
     userId    Int
     user      User     @relation(fields: [userId], references: [id])
+    isPublic  Boolean  @default(false)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
@@ -228,4 +218,12 @@ model Image {
     @@index([filename])
     @@index([createdAt])
     @@map("images")
+}
+
+enum ItemRarity {
+    Common
+    Uncommon
+    Rare
+    Epic
+    Legendary
 }

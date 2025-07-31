@@ -1,4 +1,4 @@
-export const ErrorResponseSchema = {
+const ErrorResponseSchema = {
 	type: 'object',
 	required: ['error'],
 	properties: {
@@ -8,4 +8,6 @@ export const ErrorResponseSchema = {
 		},
 	},
 	additionalProperties: false,
-} as const
+}
+
+export { ErrorResponseSchema }

@@ -4,19 +4,54 @@ import tsParser from '@typescript-eslint/parser'
 import prettier from 'eslint-plugin-prettier'
 import unicorn from 'eslint-plugin-unicorn'
 
+// Configurazione base condivisa per TypeScript
+const baseTypeScriptConfig = {
+	languageOptions: {
+		parser: tsParser,
+		parserOptions: { sourceType: 'module' },
+	},
+	plugins: {
+		'@typescript-eslint': tseslint,
+		prettier,
+		unicorn,
+	},
+	rules: {
+		'no-console': 'off',
+		'@typescript-eslint/no-explicit-any': 'off',
+		'@typescript-eslint/explicit-function-return-type': 'off',
+		'@typescript-eslint/explicit-module-boundary-types': 'off',
+		'no-unused-vars': 'off',
+		'@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+		'unicorn/filename-case': ['error', { case: 'kebabCase' }],
+		'no-multiple-empty-lines': ['warn', { max: 1 }],
+		'unicorn/no-empty-file': 'error',
+		'no-restricted-syntax': [
+			'error',
+			{
+				selector: 'ExportNamedDeclaration[declaration]',
+				message:
+					'Exports must be grouped in a single statement at the end of the file. Use: const foo = ...; export { foo };',
+			},
+			{
+				selector: 'ExportDefaultDeclaration[declaration.type!="Identifier"]',
+				message:
+					'Export default must be at the end of the file. Declare the variable/function first, then export it.',
+			},
+		],
+	},
+}
+
 /** @type {import('eslint').Linter.Config[]} */
 export default [
 	{ ignores: ['dist/**', 'src/generated/prisma/**', 'coverage/**'] },
 	js.configs.recommended,
-	// Configurazione separata per file che non sono nel progetto TypeScript (deve essere prima)
+
+	// Test files
 	{
 		files: ['tests/**/*.ts'],
+		...baseTypeScriptConfig,
 		languageOptions: {
-			parser: tsParser,
-			parserOptions: {
-				sourceType: 'module',
-				// Non specificare project per questi file
-			},
+			...baseTypeScriptConfig.languageOptions,
 			globals: {
 				jest: 'readonly',
 				describe: 'readonly',
@@ -28,78 +63,35 @@ export default [
 				afterAll: 'readonly',
 			},
 		},
-		plugins: {
-			'@typescript-eslint': tseslint,
-			prettier,
-			unicorn,
-		},
-		rules: {
-			'no-console': 'off',
-			'@typescript-eslint/no-explicit-any': 'off',
-			'@typescript-eslint/explicit-function-return-type': 'off',
-			'@typescript-eslint/explicit-module-boundary-types': 'off',
-			'no-unused-vars': 'off',
-			'@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-			'unicorn/filename-case': ['error', { case: 'kebabCase' }],
-			'no-multiple-empty-lines': ['warn', { max: 1 }],
-			'unicorn/no-empty-file': 'error',
-		},
 	},
+
+	// Prisma files
 	{
 		files: ['prisma/**/*.ts'],
+		...baseTypeScriptConfig,
 		languageOptions: {
-			parser: tsParser,
-			parserOptions: {
-				sourceType: 'module',
-				// Non specificare project per questi file
-			},
+			...baseTypeScriptConfig.languageOptions,
 			globals: {
 				console: 'readonly',
 				process: 'readonly',
 			},
 		},
-		plugins: {
-			'@typescript-eslint': tseslint,
-			prettier,
-			unicorn,
-		},
-		rules: {
-			'no-console': 'off',
-			'@typescript-eslint/no-explicit-any': 'off',
-			'@typescript-eslint/explicit-function-return-type': 'off',
-			'@typescript-eslint/explicit-module-boundary-types': 'off',
-			'no-unused-vars': 'off',
-			'@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-			'unicorn/filename-case': ['error', { case: 'kebabCase' }],
-			'no-multiple-empty-lines': ['warn', { max: 1 }],
-			'unicorn/no-empty-file': 'error',
-		},
 	},
+
+	// Source files (con type checking)
 	{
 		files: ['src/**/*.ts'],
+		...baseTypeScriptConfig,
 		languageOptions: {
-			parser: tsParser,
+			...baseTypeScriptConfig.languageOptions,
 			parserOptions: {
+				...baseTypeScriptConfig.languageOptions.parserOptions,
 				project: './tsconfig.json',
-				sourceType: 'module',
 			},
 		},
-		plugins: {
-			'@typescript-eslint': tseslint,
-			prettier,
-			unicorn,
-		},
 		rules: {
-			'no-console': 'off',
-			'@typescript-eslint/no-explicit-any': 'off',
-			'@typescript-eslint/explicit-function-return-type': 'off',
-			'@typescript-eslint/explicit-module-boundary-types': 'off',
-			'no-unused-vars': 'off',
-			'@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+			...baseTypeScriptConfig.rules,
 			'@typescript-eslint/consistent-type-exports': 'warn',
-			'unicorn/filename-case': ['error', { case: 'kebabCase' }],
-			'no-multiple-empty-lines': ['warn', { max: 1 }],
-			'unicorn/no-empty-file': 'error',
 			'no-useless-escape': 'error',
 		},
 	},

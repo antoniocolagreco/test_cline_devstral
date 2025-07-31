@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client/extension'
 import bcrypt from 'bcrypt'
-import ItemRarity from '../src/enums/item-rarity.enum'
+import ItemRarity from './../src/constants/item-rarity.constant'
 
 const prisma = new PrismaClient()
 
@@ -618,9 +618,9 @@ async function main() {
 	await Promise.all([
 		prisma.character.create({
 			data: {
-				name: 'Aragorn',
-				surname: 'Strider',
-				nickname: 'The Ranger',
+				name: 'Tharic',
+				surname: 'Dreadmoor',
+				nickname: 'The Iron Fist',
 				description: 'A skilled ranger and future king, master of sword and bow',
 				health: 120,
 				stamina: 100,
@@ -647,8 +647,9 @@ async function main() {
 		}),
 		prisma.character.create({
 			data: {
-				name: 'Gandalf',
-				surname: 'the Grey',
+				name: 'Maelor',
+				surname: 'Virelios',
+				nickname: 'The Flamecaster',
 				description: 'A powerful wizard with mastery over fire and light magic',
 				health: 80,
 				stamina: 60,
@@ -671,7 +672,9 @@ async function main() {
 		}),
 		prisma.character.create({
 			data: {
-				name: 'Legolas',
+				name: 'Elarion',
+				surname: 'Swiftarrow',
+				nickname: 'The Elven Archer',
 				description: 'An elven archer with unmatched skill with the bow',
 				health: 95,
 				stamina: 110,
@@ -695,7 +698,8 @@ async function main() {
 		}),
 		prisma.character.create({
 			data: {
-				name: 'Gimli',
+				name: 'Durgan',
+				surname: 'Emberforge',
 				description: 'A dwarven warrior with incredible strength and resilience',
 				health: 135,
 				stamina: 105,
@@ -719,8 +723,8 @@ async function main() {
 		}),
 		prisma.character.create({
 			data: {
-				name: 'Frodo',
-				surname: 'Baggins',
+				name: 'Kaelen',
+				surname: 'Thistlebrook',
 				description: 'A brave halfling with a heart full of courage',
 				health: 70,
 				stamina: 95,

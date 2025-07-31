@@ -9,8 +9,9 @@
 		"strict": true,
 		"esModuleInterop": true,
 		"paths": {
+			"@/*": ["src/*"],
 			"@shared-types/*": ["src/shared-types/*"],
-			"@enums/*": ["src/enums/*"],
+			"@constants/*": ["src/constants/*"],
 			"@utils/*": ["src/utils/*"],
 			"@services/*": ["src/services/*"],
 			"@controllers/*": ["src/controllers/*"],

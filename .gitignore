@@ -6,10 +6,14 @@ yarn-error.log
 # TypeScript compilation output
 dist/
 
+# Test coverage reports
+coverage/
+
 # Prisma
 prisma/dev.db
 prisma/dev.db-journal
 /src/generated/prisma/
+/prisma/migrations/
 
 # Editor-specific files
 .idea/

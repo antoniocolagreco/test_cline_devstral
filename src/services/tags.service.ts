@@ -130,7 +130,7 @@ const getTagService: GetOneService<GetTag> = async (id: number) => {
  * @throws ValidationError - When input data is invalid
  * @throws BusinessLogicError - When tag name already exists
  */
-const createTagService: CreateService<CreateTag> = async (data) => {
+const createTagService: CreateService<CreateTag, GetTag> = async (data) => {
 	// Validate input
 	if (!data.name || typeof data.name !== 'string') {
 		throw new ValidationError('Tag name is required and must be a string')
@@ -192,7 +192,7 @@ const createTagService: CreateService<CreateTag> = async (data) => {
  * @throws ValidationError - When input data is invalid
  * @throws BusinessLogicError - When tag name already exists for different tag
  */
-const updateTagService: UpdateService<UpdateTag> = async (data) => {
+const updateTagService: UpdateService<UpdateTag, GetTag> = async (data) => {
 	const { id, name } = data
 
 	// Validate input
