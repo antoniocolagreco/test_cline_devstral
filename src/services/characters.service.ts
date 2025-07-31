@@ -1,6 +1,6 @@
-import BusinessLogicError from '@errors/business-logic.error.js'
-import EntityNotFoundError from '@errors/entity-not-found.error.js'
-import ValidationError from '@errors/validation.error.js'
+import BusinessLogicError from '../errors/business-logic.error.js'
+import EntityNotFoundError from '../errors/entity-not-found.error.js'
+import ValidationError from '../errors/validation.error.js'
 import {
 	characterSelectWithRelations,
 	validateCharacterName,
@@ -8,17 +8,17 @@ import {
 	validateCharacterStat,
 	validateCharacterStringField,
 	validatePositiveIntegerId,
-} from '@helpers/character.helper.js'
-import { transformCharacterFromPrisma } from '@helpers/character-transform.helper.js'
-import { transformSearchToQuery } from '@helpers/services.helper.js'
-import type { CreateCharacter, GetCharacter, UpdateCharacter } from '@schemas/character.schema.js'
+} from '../helpers/character.helper.js'
+import { transformCharacterFromPrisma } from '../helpers/character-transform.helper.js'
+import { transformSearchToQuery } from '../helpers/services.helper.js'
+import type { CreateCharacter, GetCharacter, UpdateCharacter } from '../schemas/character.schema.js'
 import type {
 	CreateService,
 	DeleteService,
 	GetManyService,
 	GetOneService,
 	UpdateService,
-} from '@shared-types/services.type.js'
+} from '../shared-types/services.type.js'
 import { prisma } from '../index.js'
 
 /**

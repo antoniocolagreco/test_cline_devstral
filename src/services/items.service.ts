@@ -1,16 +1,16 @@
-import ItemRarity from '@/constants/item-rarity.constant.js'
-import BusinessLogicError from '@errors/business-logic.error.js'
-import EntityNotFoundError from '@errors/entity-not-found.error.js'
-import ValidationError from '@errors/validation.error.js'
-import { transformSearchToQuery } from '@helpers/services.helper.js'
-import type { CreateItem, GetItem, UpdateItem } from '@schemas/item.schema.js'
+import ItemRarity from '../constants/item-rarity.constant.js'
+import BusinessLogicError from '../errors/business-logic.error.js'
+import EntityNotFoundError from '../errors/entity-not-found.error.js'
+import ValidationError from '../errors/validation.error.js'
+import { transformSearchToQuery } from '../helpers/services.helper.js'
+import type { CreateItem, GetItem, UpdateItem } from '../schemas/item.schema.js'
 import type {
 	CreateService,
 	DeleteService,
 	GetManyService,
 	GetOneService,
 	UpdateService,
-} from '@shared-types/services.type.js'
+} from '../shared-types/services.type.js'
 import { prisma } from '../index.js'
 
 /**

@@ -1,15 +1,15 @@
-import BusinessLogicError from '@errors/business-logic.error.js'
-import EntityNotFoundError from '@errors/entity-not-found.error.js'
-import ValidationError from '@errors/validation.error.js'
-import { transformSearchToQuery } from '@helpers/services.helper.js'
-import type { CreateArchetype, GetArchetype, UpdateArchetype } from '@schemas/archetype.schema.js'
+import BusinessLogicError from '../errors/business-logic.error.js'
+import EntityNotFoundError from '../errors/entity-not-found.error.js'
+import ValidationError from '../errors/validation.error.js'
+import { transformSearchToQuery } from '../helpers/services.helper.js'
+import type { CreateArchetype, GetArchetype, UpdateArchetype } from '../schemas/archetype.schema.js'
 import type {
 	CreateService,
 	DeleteService,
 	GetManyService,
 	GetOneService,
 	UpdateService,
-} from '@shared-types/services.type.js'
+} from '../shared-types/services.type.js'
 import { prisma } from '../index.js'
 
 /**
