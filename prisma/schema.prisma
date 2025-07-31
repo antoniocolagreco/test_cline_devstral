@@ -1,4 +1,4 @@
-// Prisma schema generated from TypeScript models in src/models
+// Prisma schema for Fantasy Character Management System API
 // Datasource and generator
 
 generator client {
@@ -10,82 +10,153 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Author {
-    id         Int         @id @default(autoincrement())
-    name       String
-    email      String      @unique
-    characters Character[]
+model User {
+    id          Int         @id @default(autoincrement())
+    name        String // max 50 characters validated at application level
+    email       String      @unique
+    password    String? // Hashed with bcrypt, nullable for OAuth users
+    googleId    String?     @unique // OAuth Google ID
+    githubId    String?     @unique // OAuth GitHub ID  
+    discordId   String?     @unique // OAuth Discord ID
+    avatarPath  String?
+    isVerified  Boolean     @default(false)
+    isActive    Boolean     @default(true)
+    lastLoginAt DateTime?
+    createdAt   DateTime    @default(now())
+    updatedAt   DateTime    @updatedAt
+    characters  Character[]
+    images      Image[]
+
+    @@index([email])
+    @@index([googleId])
+    @@index([githubId])
+    @@index([discordId])
+    @@index([isActive])
+    @@map("users")
 }
 
 model Skill {
     id          Int         @id @default(autoincrement())
-    name        String
+    name        String      @unique
     description String?
+    createdAt   DateTime    @default(now())
+    updatedAt   DateTime    @updatedAt
     archetypes  Archetype[] @relation("ArchetypeSkills")
     races       Race[]      @relation("RaceSkills")
+    tags        Tag[]       @relation("SkillTags")
+
+    @@index([name])
+    @@map("skills")
 }
 
 model Archetype {
     id          Int         @id @default(autoincrement())
-    name        String
+    name        String      @unique
     description String?
+    createdAt   DateTime    @default(now())
+    updatedAt   DateTime    @updatedAt
     skills      Skill[]     @relation("ArchetypeSkills")
     characters  Character[]
+    tags        Tag[]       @relation("ArchetypeTags")
+
+    @@index([name])
+    @@map("archetypes")
 }
 
 model Race {
     id                   Int         @id @default(autoincrement())
-    name                 String
+    name                 String      @unique
     description          String?
+    healthModifier       Int         @default(0)
+    staminaModifier      Int         @default(0)
+    manaModifier         Int         @default(0)
+    strengthModifier     Int         @default(0)
+    dexterityModifier    Int         @default(0)
+    constitutionModifier Int         @default(0)
+    intelligenceModifier Int         @default(0)
+    wisdomModifier       Int         @default(0)
+    charismaModifier     Int         @default(0)
+    createdAt            DateTime    @default(now())
+    updatedAt            DateTime    @updatedAt
     skills               Skill[]     @relation("RaceSkills")
-    healthModifier       Int
-    manaModifier         Int
-    strengthModifier     Int
-    dexterityModifier    Int
-    constitutionModifier Int
-    intelligenceModifier Int
-    wisdomModifier       Int
-    charismaModifier     Int
     characters           Character[]
+    tags                 Tag[]       @relation("RaceTags")
+
+    @@index([name])
+    @@map("races")
 }
 
 enum ItemRarity {
-    common
-    uncommon
-    rare
-    epic
-    legendary
+    Common
+    Uncommon
+    Rare
+    Epic
+    Legendary
+}
+
+model Tag {
+    id         Int         @id @default(autoincrement())
+    name       String      @unique
+    createdAt  DateTime    @default(now())
+    updatedAt  DateTime    @updatedAt
+    items      Item[]      @relation("ItemTags")
+    characters Character[] @relation("CharacterTags")
+    skills     Skill[]     @relation("SkillTags")
+    archetypes Archetype[] @relation("ArchetypeTags")
+    races      Race[]      @relation("RaceTags")
+
+    @@index([name])
+    @@map("tags")
 }
 
 model Item {
-    id                 Int         @id @default(autoincrement())
-    name               String
-    description        String?
-    // tags        String[] // Not supported in SQLite/Prisma
-    // Equipment slots (reverse relations)
-    primaryWeaponFor   Character[] @relation("PrimaryWeapon")
-    secondaryWeaponFor Character[] @relation("SecondaryWeapon")
-    shieldFor          Character[] @relation("Shield")
-    armorFor           Character[] @relation("Armor")
-    firstRingFor       Character[] @relation("FirstRing")
-    secondRingFor      Character[] @relation("SecondRing")
-    amuletFor          Character[] @relation("Amulet")
-    rarity             ItemRarity
-    weapon             Boolean
-    armor              Boolean
-    accessory          Boolean
-    consumable         Boolean
-    attack             Int
-    defense            Int
-    strength           Int
-    dexterity          Int
-    constitution       Int
-    intelligence       Int
-    wisdom             Int
-    charisma           Int
-    durability         Int
-    weight             Int
-    characters         Character[] @relation("CharacterItems")
+    id                   Int         @id @default(autoincrement())
+    name                 String      @unique
+    description          String?
+    rarity               ItemRarity  @default(Common)
+    isWeapon             Boolean     @default(false)
+    isShield             Boolean     @default(false)
+    isArmor              Boolean     @default(false)
+    isAccessory          Boolean     @default(false)
+    isConsumable         Boolean     @default(false)
+    isQuestItem          Boolean     @default(false)
+    isCraftingMaterial   Boolean     @default(false)
+    isMiscellaneous      Boolean     @default(true)
+    attack               Int         @default(0)
+    defense              Int         @default(0)
+    requiredStrength     Int         @default(0)
+    requiredDexterity    Int         @default(0)
+    requiredConstitution Int         @default(0)
+    requiredIntelligence Int         @default(0)
+    requiredWisdom       Int         @default(0)
+    requiredCharisma     Int         @default(0)
+    bonusStrength        Int         @default(0)
+    bonusDexterity       Int         @default(0)
+    bonusConstitution    Int         @default(0)
+    bonusIntelligence    Int         @default(0)
+    bonusWisdom          Int         @default(0)
+    bonusCharisma        Int         @default(0)
+    bonusHealth          Int         @default(0)
+    durability           Int         @default(1000)
+    weight               Int         @default(1)
+    createdAt            DateTime    @default(now())
+    updatedAt            DateTime    @updatedAt
+    primaryWeaponFor     Character[] @relation("PrimaryWeapon")
+    secondaryWeaponFor   Character[] @relation("SecondaryWeapon")
+    shieldFor            Character[] @relation("Shield")
+    armorFor             Character[] @relation("Armor")
+    firstRingFor         Character[] @relation("FirstRing")
+    secondRingFor        Character[] @relation("SecondRing")
+    amuletFor            Character[] @relation("Amulet")
+    characters           Character[] @relation("CharacterItems")
+    tags                 Tag[]       @relation("ItemTags")
+
+    @@index([name])
+    @@index([rarity])
+    @@index([isWeapon])
+    @@index([isArmor])
+    @@index([isAccessory])
+    @@map("items")
 }
 
 model Character {
@@ -94,19 +165,25 @@ model Character {
     surname           String?
     nickname          String?
     description       String?
-    avatar            String?
-    health            Int
-    mana              Int
-    strength          Int
-    dexterity         Int
-    constitution      Int
-    intelligence      Int
-    wisdom            Int
-    charisma          Int
+    avatarPath        String?
+    health            Int       @default(100)
+    stamina           Int       @default(100)
+    mana              Int       @default(100)
+    strength          Int       @default(10)
+    dexterity         Int       @default(10)
+    constitution      Int       @default(10)
+    intelligence      Int       @default(10)
+    wisdom            Int       @default(10)
+    charisma          Int       @default(10)
+    isPublic          Boolean   @default(false)
+    createdAt         DateTime  @default(now())
+    updatedAt         DateTime  @updatedAt
     raceId            Int
     race              Race      @relation(fields: [raceId], references: [id])
     archetypeId       Int
     archetype         Archetype @relation(fields: [archetypeId], references: [id])
+    userId            Int       @map(" userId")
+    user              User      @relation(fields: [userId], references: [id])
     items             Item[]    @relation("CharacterItems")
     primaryWeaponId   Int?
     primaryWeapon     Item?     @relation("PrimaryWeapon", fields: [primaryWeaponId], references: [id])
@@ -122,9 +199,33 @@ model Character {
     secondRing        Item?     @relation("SecondRing", fields: [secondRingId], references: [id])
     amuletId          Int?
     amulet            Item?     @relation("Amulet", fields: [amuletId], references: [id])
-    authorId          Int
-    author            Author    @relation(fields: [authorId], references: [id])
-    isPublic          Boolean
-    createdAt         DateTime  @default(now())
-    updatedAt         DateTime  @updatedAt
+    tags              Tag[]     @relation("CharacterTags")
+
+    @@index([name])
+    @@index([userId])
+    @@index([raceId])
+    @@index([archetypeId])
+    @@index([isPublic])
+    @@index([createdAt])
+    @@index([userId, isPublic]) // Composite index for filtering characters by user and visibility
+    @@map("characters")
+}
+
+model Image {
+    id        Int      @id @default(autoincrement())
+    buffer    Bytes
+    filename  String
+    size      Int
+    width     Int
+    height    Int
+    mimeType  String
+    userId    Int
+    user      User     @relation(fields: [userId], references: [id])
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([userId])
+    @@index([filename])
+    @@index([createdAt])
+    @@map("images")
 }

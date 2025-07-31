@@ -10,4 +10,5 @@ export default {
     bracketSpacing: true,
     arrowParens: 'always',
     endOfLine: 'crlf',
+    useTabs: true,
 }

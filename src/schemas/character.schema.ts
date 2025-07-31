@@ -1,57 +1,88 @@
-// Fastify JSON Schema for Character input validation
-export const characterSchema = {
-    type: 'object',
-    required: [
-        'id',
-        'name',
-        'health',
-        'mana',
-        'strength',
-        'dexterity',
-        'constitution',
-        'intelligence',
-        'wisdom',
-        'charisma',
-        'race',
-        'archetype',
-        'author',
-        'isPublic',
-        'createdAt',
-        'updatedAt',
-    ],
-    properties: {
-        id: { type: 'integer' },
-        name: { type: 'string', minLength: 1 },
-        surname: { type: 'string' },
-        nickname: { type: 'string' },
-        description: { type: 'string' },
-        avatar: { type: 'string' },
-        health: { type: 'integer' },
-        mana: { type: 'integer' },
-        strength: { type: 'integer' },
-        dexterity: { type: 'integer' },
-        constitution: { type: 'integer' },
-        intelligence: { type: 'integer' },
-        wisdom: { type: 'integer' },
-        charisma: { type: 'integer' },
-        race: { $ref: 'raceSchema#' },
-        archetype: { $ref: 'archetypeSchema#' },
-        items: { type: 'array', items: { $ref: 'itemSchema#' } },
-        primaryWeapon: { $ref: 'itemSchema#' },
-        secondaryWeapon: { $ref: 'itemSchema#' },
-        shield: { $ref: 'itemSchema#' },
-        armor: { $ref: 'itemSchema#' },
-        firstRing: { $ref: 'itemSchema#' },
-        secondRing: { $ref: 'itemSchema#' },
-        amulet: { $ref: 'itemSchema#' },
-        author: { $ref: 'authorSchema#' },
-        isPublic: { type: 'boolean' },
-        createdAt: { type: 'string', format: 'date-time' },
-        updatedAt: { type: 'string', format: 'date-time' },
-    },
-    additionalProperties: false,
-}
+import { Static, Type } from '@sinclair/typebox'
 
-// Example: import and use in route
-// import { characterSchema } from '../schemas/character.schema';
-// fastify.post('/characters', { schema: { body: characterSchema }, handler: ... })
+const GetCharacterSchema = Type.Object(
+	{
+		id: Type.Integer(),
+		name: Type.String({ minLength: 1, maxLength: 50 }),
+		surname: Type.Optional(Type.String({ maxLength: 50 })),
+		nickname: Type.Optional(Type.String({ maxLength: 30 })),
+		description: Type.Optional(Type.String({ maxLength: 1000 })),
+		health: Type.Integer({ minimum: 1 }),
+		stamina: Type.Integer({ minimum: 1 }),
+		mana: Type.Integer({ minimum: 1 }),
+		strength: Type.Integer({ minimum: 1, maximum: 20 }),
+		dexterity: Type.Integer({ minimum: 1, maximum: 20 }),
+		constitution: Type.Integer({ minimum: 1, maximum: 20 }),
+		intelligence: Type.Integer({ minimum: 1, maximum: 20 }),
+		wisdom: Type.Integer({ minimum: 1, maximum: 20 }),
+		charisma: Type.Integer({ minimum: 1, maximum: 20 }),
+		isPublic: Type.Boolean(),
+		raceId: Type.Integer({ minimum: 1 }),
+		archetypeId: Type.Integer({ minimum: 1 }),
+		userId: Type.Integer({ minimum: 1 }),
+		createdAt: Type.String({ format: 'date-time' }),
+		updatedAt: Type.String({ format: 'date-time' }),
+	},
+	{ additionalProperties: false },
+)
+
+const CreateCharacterSchema = Type.Object(
+	{
+		name: Type.String({ minLength: 1, maxLength: 50 }),
+		surname: Type.Optional(Type.String({ maxLength: 50 })),
+		nickname: Type.Optional(Type.String({ maxLength: 30 })),
+		description: Type.Optional(Type.String({ maxLength: 1000 })),
+		health: Type.Integer({ minimum: 1 }),
+		stamina: Type.Integer({ minimum: 1 }),
+		mana: Type.Integer({ minimum: 1 }),
+		strength: Type.Integer({ minimum: 1, maximum: 20 }),
+		dexterity: Type.Integer({ minimum: 1, maximum: 20 }),
+		constitution: Type.Integer({ minimum: 1, maximum: 20 }),
+		intelligence: Type.Integer({ minimum: 1, maximum: 20 }),
+		wisdom: Type.Integer({ minimum: 1, maximum: 20 }),
+		charisma: Type.Integer({ minimum: 1, maximum: 20 }),
+		isPublic: Type.Boolean(),
+		raceId: Type.Integer({ minimum: 1 }),
+		archetypeId: Type.Integer({ minimum: 1 }),
+		userId: Type.Integer({ minimum: 1 }),
+	},
+	{ additionalProperties: false },
+)
+
+const UpdateCharacterSchema = Type.Object(
+	{
+		id: Type.Integer({ minimum: 1 }),
+		name: Type.Optional(Type.String({ minLength: 1, maxLength: 50 })),
+		surname: Type.Optional(Type.String({ maxLength: 50 })),
+		nickname: Type.Optional(Type.String({ maxLength: 30 })),
+		description: Type.Optional(Type.String({ maxLength: 1000 })),
+		health: Type.Optional(Type.Integer({ minimum: 1 })),
+		stamina: Type.Optional(Type.Integer({ minimum: 1 })),
+		mana: Type.Optional(Type.Integer({ minimum: 1 })),
+		strength: Type.Optional(Type.Integer({ minimum: 1, maximum: 20 })),
+		dexterity: Type.Optional(Type.Integer({ minimum: 1, maximum: 20 })),
+		constitution: Type.Optional(Type.Integer({ minimum: 1, maximum: 20 })),
+		intelligence: Type.Optional(Type.Integer({ minimum: 1, maximum: 20 })),
+		wisdom: Type.Optional(Type.Integer({ minimum: 1, maximum: 20 })),
+		charisma: Type.Optional(Type.Integer({ minimum: 1, maximum: 20 })),
+		isPublic: Type.Optional(Type.Boolean()),
+		raceId: Type.Optional(Type.Integer({ minimum: 1 })),
+		archetypeId: Type.Optional(Type.Integer({ minimum: 1 })),
+		userId: Type.Optional(Type.Integer({ minimum: 1 })),
+	},
+	{ additionalProperties: false },
+)
+
+const GetCharacterParamsSchema = Type.Object(
+	{
+		id: Type.String({ pattern: '^[1-9]\\d*$' }),
+	},
+	{ additionalProperties: false },
+)
+
+export type GetCharacter = Static<typeof GetCharacterSchema>
+export type CreateCharacter = Static<typeof CreateCharacterSchema>
+export type UpdateCharacter = Static<typeof UpdateCharacterSchema>
+export type GetCharacterParams = Static<typeof GetCharacterParamsSchema>
+
+export { CreateCharacterSchema, GetCharacterParamsSchema, GetCharacterSchema, UpdateCharacterSchema }

@@ -1,14 +1,43 @@
-import type { JSONSchemaType } from 'ajv'
-import type Skill from '../models/skill'
+import { Type, Static } from '@sinclair/typebox'
 
-// Fastify JSON Schema for Skill input validation
-export const skillSchema: JSONSchemaType<Skill> = {
-    type: 'object',
-    required: ['id', 'name'],
-    properties: {
-        id: { type: 'integer' },
-        name: { type: 'string', minLength: 1 },
-        description: { type: 'string', nullable: true },
-    },
-    additionalProperties: false,
-}
+const GetSkillSchema = Type.Object(
+	{
+		id: Type.Integer(),
+		name: Type.String({ minLength: 1, maxLength: 100 }),
+		description: Type.Optional(Type.String({ maxLength: 500 })),
+		createdAt: Type.String({ format: 'date-time' }),
+		updatedAt: Type.String({ format: 'date-time' }),
+	},
+	{ additionalProperties: false },
+)
+
+const CreateSkillSchema = Type.Object(
+	{
+		name: Type.String({ minLength: 1, maxLength: 100 }),
+		description: Type.Optional(Type.String({ maxLength: 500 })),
+	},
+	{ additionalProperties: false },
+)
+
+const UpdateSkillSchema = Type.Object(
+	{
+		id: Type.Integer({ minimum: 1 }),
+		name: Type.Optional(Type.String({ minLength: 1, maxLength: 100 })),
+		description: Type.Optional(Type.String({ maxLength: 500 })),
+	},
+	{ additionalProperties: false },
+)
+
+const GetSkillParamsSchema = Type.Object(
+	{
+		id: Type.String({ pattern: '^[1-9]\\d*$' }),
+	},
+	{ additionalProperties: false },
+)
+
+export type GetSkill = Static<typeof GetSkillSchema>
+export type CreateSkill = Static<typeof CreateSkillSchema>
+export type UpdateSkill = Static<typeof UpdateSkillSchema>
+export type GetSkillParams = Static<typeof GetSkillParamsSchema>
+
+export { GetSkillSchema, CreateSkillSchema, UpdateSkillSchema, GetSkillParamsSchema }

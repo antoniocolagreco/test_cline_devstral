@@ -1,13 +1,28 @@
 {
-    "compilerOptions": {
-        "target": "ESNext",
-        "module": "ESNext",
-        "moduleResolution": "node",
-        "outDir": "./dist",
-        "rootDir": "./src",
-        "strict": true,
-        "esModuleInterop": true
-    },
-    "include": ["src/**/*.ts"],
-    "exclude": ["node_modules", "dist"]
+	"compilerOptions": {
+		"baseUrl": "./",
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"strict": true,
+		"esModuleInterop": true,
+		"paths": {
+			"@shared-types/*": ["src/shared-types/*"],
+			"@enums/*": ["src/enums/*"],
+			"@utils/*": ["src/utils/*"],
+			"@services/*": ["src/services/*"],
+			"@controllers/*": ["src/controllers/*"],
+			"@routes/*": ["src/routes/*"],
+			"@helpers/*": ["src/helpers/*"],
+			"@middlewares/*": ["src/middlewares/*"],
+			"@prisma/*": ["src/generated/prisma/*"],
+			"@errors/*": ["src/errors/*"],
+			"@schemas/*": ["src/schemas/*"]
+		}
+	},
+	"include": ["src/**/*.ts", "src/**/*.tsx"],
+	"exclude": ["node_modules", "dist"]
 }
+
