@@ -1,6 +1,15 @@
 import BusinessLogicError from '@errors/business-logic.error.js'
 import EntityNotFoundError from '@errors/entity-not-found.error.js'
 import ValidationError from '@errors/validation.error.js'
+import {
+	characterSelectWithRelations,
+	validateCharacterName,
+	validateCharacterResource,
+	validateCharacterStat,
+	validateCharacterStringField,
+	validatePositiveIntegerId,
+} from '@helpers/character.helper.js'
+import { transformCharacterFromPrisma } from '@helpers/character-transform.helper.js'
 import { transformSearchToQuery } from '@helpers/services.helper.js'
 import type { CreateCharacter, GetCharacter, UpdateCharacter } from '@schemas/character.schema.js'
 import type {
@@ -11,135 +20,6 @@ import type {
 	UpdateService,
 } from '@shared-types/services.type.js'
 import { prisma } from '../index.js'
-
-/**
- * Helper function to calculate aggregate stats based on base stats, race modifiers, and equipped items
- */
-const calculateAggregateStats = (character: {
-	health: number
-	stamina: number
-	mana: number
-	strength: number
-	dexterity: number
-	constitution: number
-	intelligence: number
-	wisdom: number
-	charisma: number
-	race: {
-		healthModifier: number
-		staminaModifier: number
-		manaModifier: number
-		strengthModifier: number
-		dexterityModifier: number
-		constitutionModifier: number
-		intelligenceModifier: number
-		wisdomModifier: number
-		charismaModifier: number
-	}
-	primaryWeapon?: {
-		bonusStrength: number
-		bonusDexterity: number
-		bonusConstitution: number
-		bonusIntelligence: number
-		bonusWisdom: number
-		bonusCharisma: number
-		bonusHealth: number
-	} | null
-	secondaryWeapon?: {
-		bonusStrength: number
-		bonusDexterity: number
-		bonusConstitution: number
-		bonusIntelligence: number
-		bonusWisdom: number
-		bonusCharisma: number
-		bonusHealth: number
-	} | null
-	shield?: {
-		bonusStrength: number
-		bonusDexterity: number
-		bonusConstitution: number
-		bonusIntelligence: number
-		bonusWisdom: number
-		bonusCharisma: number
-		bonusHealth: number
-	} | null
-	armor?: {
-		bonusStrength: number
-		bonusDexterity: number
-		bonusConstitution: number
-		bonusIntelligence: number
-		bonusWisdom: number
-		bonusCharisma: number
-		bonusHealth: number
-	} | null
-	firstRing?: {
-		bonusStrength: number
-		bonusDexterity: number
-		bonusConstitution: number
-		bonusIntelligence: number
-		bonusWisdom: number
-		bonusCharisma: number
-		bonusHealth: number
-	} | null
-	secondRing?: {
-		bonusStrength: number
-		bonusDexterity: number
-		bonusConstitution: number
-		bonusIntelligence: number
-		bonusWisdom: number
-		bonusCharisma: number
-		bonusHealth: number
-	} | null
-	amulet?: {
-		bonusStrength: number
-		bonusDexterity: number
-		bonusConstitution: number
-		bonusIntelligence: number
-		bonusWisdom: number
-		bonusCharisma: number
-		bonusHealth: number
-	} | null
-}) => {
-	const items = [
-		character.primaryWeapon,
-		character.secondaryWeapon,
-		character.shield,
-		character.armor,
-		character.firstRing,
-		character.secondRing,
-		character.amulet,
-	].filter(Boolean)
-
-	const totalItemBonuses = items.reduce(
-		(acc, item) => {
-			if (item) {
-				acc.health += item.bonusHealth
-				acc.strength += item.bonusStrength
-				acc.dexterity += item.bonusDexterity
-				acc.constitution += item.bonusConstitution
-				acc.intelligence += item.bonusIntelligence
-				acc.wisdom += item.bonusWisdom
-				acc.charisma += item.bonusCharisma
-			}
-			return acc
-		},
-		{ health: 0, strength: 0, dexterity: 0, constitution: 0, intelligence: 0, wisdom: 0, charisma: 0 },
-	)
-
-	return {
-		aggregateHealth: character.health + character.race.healthModifier + totalItemBonuses.health,
-		aggregateStamina: character.stamina + character.race.staminaModifier,
-		aggregateMana: character.mana + character.race.manaModifier,
-		aggregateStrength: character.strength + character.race.strengthModifier + totalItemBonuses.strength,
-		aggregateDexterity: character.dexterity + character.race.dexterityModifier + totalItemBonuses.dexterity,
-		aggregateConstitution:
-			character.constitution + character.race.constitutionModifier + totalItemBonuses.constitution,
-		aggregateIntelligence:
-			character.intelligence + character.race.intelligenceModifier + totalItemBonuses.intelligence,
-		aggregateWisdom: character.wisdom + character.race.wisdomModifier + totalItemBonuses.wisdom,
-		aggregateCharisma: character.charisma + character.race.charismaModifier + totalItemBonuses.charisma,
-	}
-}
 
 /**
  * Service function to get many characters with optional filtering, searching, and pagination
@@ -177,119 +57,7 @@ const getCharactersService: GetManyService<GetCharacter> = async (params) => {
 				orderBy: orderByClause,
 				skip,
 				take: validatedPageSize,
-				select: {
-					id: true,
-					name: true,
-					surname: true,
-					nickname: true,
-					description: true,
-					avatarPath: true,
-					health: true,
-					stamina: true,
-					mana: true,
-					strength: true,
-					dexterity: true,
-					constitution: true,
-					intelligence: true,
-					wisdom: true,
-					charisma: true,
-					isPublic: true,
-					raceId: true,
-					archetypeId: true,
-					userId: true,
-					createdAt: true,
-					updatedAt: true,
-					race: {
-						select: {
-							strengthModifier: true,
-							dexterityModifier: true,
-							constitutionModifier: true,
-							intelligenceModifier: true,
-							wisdomModifier: true,
-							charismaModifier: true,
-							healthModifier: true,
-							staminaModifier: true,
-							manaModifier: true,
-						},
-					},
-					primaryWeapon: {
-						select: {
-							bonusStrength: true,
-							bonusDexterity: true,
-							bonusConstitution: true,
-							bonusIntelligence: true,
-							bonusWisdom: true,
-							bonusCharisma: true,
-							bonusHealth: true,
-						},
-					},
-					secondaryWeapon: {
-						select: {
-							bonusStrength: true,
-							bonusDexterity: true,
-							bonusConstitution: true,
-							bonusIntelligence: true,
-							bonusWisdom: true,
-							bonusCharisma: true,
-							bonusHealth: true,
-						},
-					},
-					shield: {
-						select: {
-							bonusStrength: true,
-							bonusDexterity: true,
-							bonusConstitution: true,
-							bonusIntelligence: true,
-							bonusWisdom: true,
-							bonusCharisma: true,
-							bonusHealth: true,
-						},
-					},
-					armor: {
-						select: {
-							bonusStrength: true,
-							bonusDexterity: true,
-							bonusConstitution: true,
-							bonusIntelligence: true,
-							bonusWisdom: true,
-							bonusCharisma: true,
-							bonusHealth: true,
-						},
-					},
-					firstRing: {
-						select: {
-							bonusStrength: true,
-							bonusDexterity: true,
-							bonusConstitution: true,
-							bonusIntelligence: true,
-							bonusWisdom: true,
-							bonusCharisma: true,
-							bonusHealth: true,
-						},
-					},
-					secondRing: {
-						select: {
-							bonusStrength: true,
-							bonusDexterity: true,
-							bonusConstitution: true,
-							bonusIntelligence: true,
-							bonusWisdom: true,
-							bonusCharisma: true,
-							bonusHealth: true,
-						},
-					},
-					amulet: {
-						select: {
-							bonusStrength: true,
-							bonusDexterity: true,
-							bonusConstitution: true,
-							bonusIntelligence: true,
-							bonusWisdom: true,
-							bonusCharisma: true,
-							bonusHealth: true,
-						},
-					},
-				},
+				select: characterSelectWithRelations,
 			}),
 			prisma.character.count({ where: searchQuery }),
 		])
@@ -297,37 +65,8 @@ const getCharactersService: GetManyService<GetCharacter> = async (params) => {
 		const totalPages = Math.ceil(total / validatedPageSize)
 
 		// Transform character data to match API schema format
-		const transformCharacter = (character: (typeof characters)[0]): GetCharacter => {
-			const aggregateStats = calculateAggregateStats(character)
-
-			return {
-				id: character.id,
-				name: character.name,
-				surname: character.surname || undefined,
-				nickname: character.nickname || undefined,
-				description: character.description || undefined,
-				avatarPath: character.avatarPath || undefined,
-				health: character.health,
-				stamina: character.stamina,
-				mana: character.mana,
-				strength: character.strength,
-				dexterity: character.dexterity,
-				constitution: character.constitution,
-				intelligence: character.intelligence,
-				wisdom: character.wisdom,
-				charisma: character.charisma,
-				...aggregateStats,
-				isPublic: character.isPublic,
-				raceId: character.raceId,
-				archetypeId: character.archetypeId,
-				userId: character.userId,
-				createdAt: character.createdAt.toISOString(),
-				updatedAt: character.updatedAt.toISOString(),
-			}
-		}
-
 		return {
-			data: characters.map(transformCharacter),
+			data: characters.map(transformCharacterFromPrisma),
 			pagination: {
 				page: validatedPage,
 				pageSize: validatedPageSize,
@@ -358,153 +97,15 @@ const getCharacterService: GetOneService<GetCharacter> = async (id: number) => {
 	try {
 		const character = await prisma.character.findUnique({
 			where: { id },
-			select: {
-				id: true,
-				name: true,
-				surname: true,
-				nickname: true,
-				description: true,
-				avatarPath: true,
-				health: true,
-				stamina: true,
-				mana: true,
-				strength: true,
-				dexterity: true,
-				constitution: true,
-				intelligence: true,
-				wisdom: true,
-				charisma: true,
-				isPublic: true,
-				raceId: true,
-				archetypeId: true,
-				userId: true,
-				createdAt: true,
-				updatedAt: true,
-				race: {
-					select: {
-						healthModifier: true,
-						staminaModifier: true,
-						manaModifier: true,
-						strengthModifier: true,
-						dexterityModifier: true,
-						constitutionModifier: true,
-						intelligenceModifier: true,
-						wisdomModifier: true,
-						charismaModifier: true,
-					},
-				},
-				primaryWeapon: {
-					select: {
-						bonusStrength: true,
-						bonusDexterity: true,
-						bonusConstitution: true,
-						bonusIntelligence: true,
-						bonusWisdom: true,
-						bonusCharisma: true,
-						bonusHealth: true,
-					},
-				},
-				secondaryWeapon: {
-					select: {
-						bonusStrength: true,
-						bonusDexterity: true,
-						bonusConstitution: true,
-						bonusIntelligence: true,
-						bonusWisdom: true,
-						bonusCharisma: true,
-						bonusHealth: true,
-					},
-				},
-				shield: {
-					select: {
-						bonusStrength: true,
-						bonusDexterity: true,
-						bonusConstitution: true,
-						bonusIntelligence: true,
-						bonusWisdom: true,
-						bonusCharisma: true,
-						bonusHealth: true,
-					},
-				},
-				armor: {
-					select: {
-						bonusStrength: true,
-						bonusDexterity: true,
-						bonusConstitution: true,
-						bonusIntelligence: true,
-						bonusWisdom: true,
-						bonusCharisma: true,
-						bonusHealth: true,
-					},
-				},
-				firstRing: {
-					select: {
-						bonusStrength: true,
-						bonusDexterity: true,
-						bonusConstitution: true,
-						bonusIntelligence: true,
-						bonusWisdom: true,
-						bonusCharisma: true,
-						bonusHealth: true,
-					},
-				},
-				secondRing: {
-					select: {
-						bonusStrength: true,
-						bonusDexterity: true,
-						bonusConstitution: true,
-						bonusIntelligence: true,
-						bonusWisdom: true,
-						bonusCharisma: true,
-						bonusHealth: true,
-					},
-				},
-				amulet: {
-					select: {
-						bonusStrength: true,
-						bonusDexterity: true,
-						bonusConstitution: true,
-						bonusIntelligence: true,
-						bonusWisdom: true,
-						bonusCharisma: true,
-						bonusHealth: true,
-					},
-				},
-			},
+			select: characterSelectWithRelations,
 		})
 
 		if (!character) {
 			return null
 		}
 
-		// Calculate aggregate stats
-		const aggregateStats = calculateAggregateStats(character)
-
 		// Transform and return character data
-		return {
-			id: character.id,
-			name: character.name,
-			surname: character.surname || undefined,
-			nickname: character.nickname || undefined,
-			description: character.description || undefined,
-			avatarPath: character.avatarPath || undefined,
-			health: character.health,
-			stamina: character.stamina,
-			mana: character.mana,
-			strength: character.strength,
-			dexterity: character.dexterity,
-			constitution: character.constitution,
-			intelligence: character.intelligence,
-			wisdom: character.wisdom,
-			charisma: character.charisma,
-			...aggregateStats,
-			isPublic: character.isPublic,
-			raceId: character.raceId,
-			archetypeId: character.archetypeId,
-			userId: character.userId,
-			createdAt: character.createdAt.toISOString(),
-			updatedAt: character.updatedAt.toISOString(),
-		}
+		return transformCharacterFromPrisma(character)
 	} catch (error) {
 		if (error instanceof ValidationError) {
 			throw error
@@ -523,90 +124,40 @@ const getCharacterService: GetOneService<GetCharacter> = async (id: number) => {
  * @throws EntityNotFoundError - When referenced entities don't exist
  */
 const createCharacterService: CreateService<CreateCharacter, GetCharacter> = async (data) => {
-	// Validate required fields
-	if (!data.name || typeof data.name !== 'string') {
-		throw new ValidationError('Character name is required and must be a string')
+	// Validate required fields using helper functions
+	const trimmedName = validateCharacterName(data.name, true)!
+
+	// Validate optional string fields
+	const trimmedSurname = validateCharacterStringField(data.surname, 'surname', 50)
+	const trimmedNickname = validateCharacterStringField(data.nickname, 'nickname', 30)
+	const trimmedDescription = validateCharacterStringField(data.description, 'description', 1000)
+
+	if (data.avatarPath !== undefined && typeof data.avatarPath !== 'string') {
+		throw new ValidationError('Character avatarPath must be a string')
 	}
 
-	const trimmedName = data.name.trim()
-	if (trimmedName.length === 0) {
-		throw new ValidationError('Character name cannot be empty')
-	}
+	// Validate stat constraints using helper functions
+	validateCharacterStat(data.strength, 'strength', true)
+	validateCharacterStat(data.dexterity, 'dexterity', true)
+	validateCharacterStat(data.constitution, 'constitution', true)
+	validateCharacterStat(data.intelligence, 'intelligence', true)
+	validateCharacterStat(data.wisdom, 'wisdom', true)
+	validateCharacterStat(data.charisma, 'charisma', true)
 
-	// Validate name length according to schema constraints
-	if (trimmedName.length > 50) {
-		throw new ValidationError('Character name cannot exceed 50 characters')
-	}
-
-	// Validate optional fields
-	if (data.surname !== undefined) {
-		if (typeof data.surname !== 'string') {
-			throw new ValidationError('Character surname must be a string')
-		}
-		if (data.surname.trim().length > 50) {
-			throw new ValidationError('Character surname cannot exceed 50 characters')
-		}
-	}
-
-	if (data.nickname !== undefined) {
-		if (typeof data.nickname !== 'string') {
-			throw new ValidationError('Character nickname must be a string')
-		}
-		if (data.nickname.trim().length > 30) {
-			throw new ValidationError('Character nickname cannot exceed 30 characters')
-		}
-	}
-
-	if (data.description !== undefined) {
-		if (typeof data.description !== 'string') {
-			throw new ValidationError('Character description must be a string')
-		}
-		if (data.description.trim().length > 1000) {
-			throw new ValidationError('Character description cannot exceed 1000 characters')
-		}
-	}
-
-	if (data.avatarPath !== undefined) {
-		if (typeof data.avatarPath !== 'string') {
-			throw new ValidationError('Character avatarPath must be a string')
-		}
-	}
-
-	// Validate stat constraints (1-20 range as per schema)
-	const statFields = ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'] as const
-	for (const stat of statFields) {
-		const value = data[stat]
-		if (!Number.isInteger(value) || value < 1 || value > 20) {
-			throw new ValidationError(`Character ${stat} must be an integer between 1 and 20`)
-		}
-	}
-
-	// Validate resource stats (health, stamina, mana) - minimum 1
-	const resourceFields = ['health', 'stamina', 'mana'] as const
-	for (const resource of resourceFields) {
-		const value = data[resource]
-		if (!Number.isInteger(value) || value < 1) {
-			throw new ValidationError(`Character ${resource} must be an integer of at least 1`)
-		}
-	}
+	// Validate resource stats using helper functions
+	validateCharacterResource(data.health, 'health', true)
+	validateCharacterResource(data.stamina, 'stamina', true)
+	validateCharacterResource(data.mana, 'mana', true)
 
 	// Validate boolean field
 	if (typeof data.isPublic !== 'boolean') {
 		throw new ValidationError('Character isPublic must be a boolean')
 	}
 
-	// Validate foreign key IDs
-	if (!Number.isInteger(data.userId) || data.userId <= 0) {
-		throw new ValidationError('User ID must be a positive integer')
-	}
-
-	if (!Number.isInteger(data.raceId) || data.raceId <= 0) {
-		throw new ValidationError('Race ID must be a positive integer')
-	}
-
-	if (!Number.isInteger(data.archetypeId) || data.archetypeId <= 0) {
-		throw new ValidationError('Archetype ID must be a positive integer')
-	}
+	// Validate foreign key IDs using helper functions
+	validatePositiveIntegerId(data.userId, 'User ID', true)
+	validatePositiveIntegerId(data.raceId, 'Race ID', true)
+	validatePositiveIntegerId(data.archetypeId, 'Archetype ID', true)
 
 	try {
 		// Use transaction to ensure data consistency
@@ -662,9 +213,9 @@ const createCharacterService: CreateService<CreateCharacter, GetCharacter> = asy
 			const createdCharacter = await tx.character.create({
 				data: {
 					name: trimmedName,
-					surname: data.surname?.trim() || null,
-					nickname: data.nickname?.trim() || null,
-					description: data.description?.trim() || null,
+					surname: trimmedSurname || null,
+					nickname: trimmedNickname || null,
+					description: trimmedDescription || null,
 					avatarPath: data.avatarPath?.trim() || null,
 					health: data.health,
 					stamina: data.stamina,
@@ -743,110 +294,42 @@ const updateCharacterService: UpdateService<UpdateCharacter, GetCharacter> = asy
 	} = data
 
 	// Validate character ID
-	if (!Number.isInteger(id) || id <= 0) {
-		throw new ValidationError('Character ID must be a positive integer')
-	}
+	validatePositiveIntegerId(id, 'Character ID', true)
 
 	// Validate name if provided
-	if (name !== undefined) {
-		if (typeof name !== 'string') {
-			throw new ValidationError('Character name must be a string')
-		}
-
-		const trimmedName = name.trim()
-		if (trimmedName.length === 0) {
-			throw new ValidationError('Character name cannot be empty')
-		}
-
-		if (trimmedName.length > 50) {
-			throw new ValidationError('Character name cannot exceed 50 characters')
-		}
-	}
+	const trimmedName = validateCharacterName(name)
 
 	// Validate optional string fields if provided
-	if (surname !== undefined) {
-		if (typeof surname !== 'string') {
-			throw new ValidationError('Character surname must be a string')
-		}
-		if (surname.trim().length > 50) {
-			throw new ValidationError('Character surname cannot exceed 50 characters')
-		}
+	const trimmedSurname = validateCharacterStringField(surname, 'surname', 50)
+	const trimmedNickname = validateCharacterStringField(nickname, 'nickname', 30)
+	const trimmedDescription = validateCharacterStringField(description, 'description', 1000)
+
+	if (avatarPath !== undefined && typeof avatarPath !== 'string') {
+		throw new ValidationError('Character avatarPath must be a string')
 	}
 
-	if (nickname !== undefined) {
-		if (typeof nickname !== 'string') {
-			throw new ValidationError('Character nickname must be a string')
-		}
-		if (nickname.trim().length > 30) {
-			throw new ValidationError('Character nickname cannot exceed 30 characters')
-		}
-	}
+	// Validate stat fields if provided using helper functions
+	validateCharacterStat(strength, 'strength')
+	validateCharacterStat(dexterity, 'dexterity')
+	validateCharacterStat(constitution, 'constitution')
+	validateCharacterStat(intelligence, 'intelligence')
+	validateCharacterStat(wisdom, 'wisdom')
+	validateCharacterStat(charisma, 'charisma')
 
-	if (description !== undefined) {
-		if (typeof description !== 'string') {
-			throw new ValidationError('Character description must be a string')
-		}
-		if (description.trim().length > 1000) {
-			throw new ValidationError('Character description cannot exceed 1000 characters')
-		}
-	}
-
-	if (avatarPath !== undefined) {
-		if (typeof avatarPath !== 'string') {
-			throw new ValidationError('Character avatarPath must be a string')
-		}
-	}
-
-	// Validate stat fields if provided (1-20 range)
-	const statFields = [
-		{ field: 'strength', value: strength },
-		{ field: 'dexterity', value: dexterity },
-		{ field: 'constitution', value: constitution },
-		{ field: 'intelligence', value: intelligence },
-		{ field: 'wisdom', value: wisdom },
-		{ field: 'charisma', value: charisma },
-	] as const
-
-	for (const { field, value } of statFields) {
-		if (value !== undefined) {
-			if (!Number.isInteger(value) || value < 1 || value > 20) {
-				throw new ValidationError(`Character ${field} must be an integer between 1 and 20`)
-			}
-		}
-	}
-
-	// Validate resource fields if provided (minimum 1)
-	const resourceFields = [
-		{ field: 'health', value: health },
-		{ field: 'stamina', value: stamina },
-		{ field: 'mana', value: mana },
-	] as const
-
-	for (const { field, value } of resourceFields) {
-		if (value !== undefined) {
-			if (!Number.isInteger(value) || value < 1) {
-				throw new ValidationError(`Character ${field} must be an integer of at least 1`)
-			}
-		}
-	}
+	// Validate resource fields if provided using helper functions
+	validateCharacterResource(health, 'health')
+	validateCharacterResource(stamina, 'stamina')
+	validateCharacterResource(mana, 'mana')
 
 	// Validate boolean field if provided
 	if (isPublic !== undefined && typeof isPublic !== 'boolean') {
 		throw new ValidationError('Character isPublic must be a boolean')
 	}
 
-	// Validate foreign key IDs if provided
-	if (userId !== undefined && (!Number.isInteger(userId) || userId <= 0)) {
-		throw new ValidationError('User ID must be a positive integer')
-	}
-
-	if (raceId !== undefined && (!Number.isInteger(raceId) || raceId <= 0)) {
-		throw new ValidationError('Race ID must be a positive integer')
-	}
-
-	if (archetypeId !== undefined && (!Number.isInteger(archetypeId) || archetypeId <= 0)) {
-		throw new ValidationError('Archetype ID must be a positive integer')
-	}
+	// Validate foreign key IDs if provided using helper functions
+	validatePositiveIntegerId(userId, 'User ID')
+	validatePositiveIntegerId(raceId, 'Race ID')
+	validatePositiveIntegerId(archetypeId, 'Archetype ID')
 
 	try {
 		// Check if referenced entities exist (if being updated)
@@ -888,9 +371,7 @@ const updateCharacterService: UpdateService<UpdateCharacter, GetCharacter> = asy
 		}
 
 		// Check if character name already exists for user (if both name and userId are being updated)
-		if (name !== undefined) {
-			const trimmedName = name.trim()
-
+		if (trimmedName !== undefined) {
 			// Get current character to check user ID
 			const currentCharacter = await prisma.character.findUnique({
 				where: { id },
@@ -920,17 +401,17 @@ const updateCharacterService: UpdateService<UpdateCharacter, GetCharacter> = asy
 		// Build update data object only with provided fields
 		const updateData: Record<string, any> = {}
 
-		if (name !== undefined) {
-			updateData.name = name.trim()
+		if (trimmedName !== undefined) {
+			updateData.name = trimmedName
 		}
-		if (surname !== undefined) {
-			updateData.surname = surname.trim() || null
+		if (trimmedSurname !== undefined) {
+			updateData.surname = trimmedSurname
 		}
-		if (nickname !== undefined) {
-			updateData.nickname = nickname.trim() || null
+		if (trimmedNickname !== undefined) {
+			updateData.nickname = trimmedNickname
 		}
-		if (description !== undefined) {
-			updateData.description = description.trim() || null
+		if (trimmedDescription !== undefined) {
+			updateData.description = trimmedDescription
 		}
 		if (avatarPath !== undefined) {
 			updateData.avatarPath = avatarPath.trim() || null
@@ -1005,7 +486,7 @@ const updateCharacterService: UpdateService<UpdateCharacter, GetCharacter> = asy
 		}
 		// Handle Prisma unique constraint violation
 		if (error instanceof Error && 'code' in error && error.code === 'P2002') {
-			throw new BusinessLogicError(`Character with name "${name?.trim()}" already exists for this user`)
+			throw new BusinessLogicError(`Character with name "${trimmedName}" already exists for this user`)
 		}
 		throw new Error(`Failed to update character: ${error instanceof Error ? error.message : 'Unknown error'}`)
 	}
@@ -1020,10 +501,8 @@ const updateCharacterService: UpdateService<UpdateCharacter, GetCharacter> = asy
  * @throws EntityNotFoundError - When character is not found
  */
 const deleteCharacterService: DeleteService = async (id: number) => {
-	// Validate input
-	if (!Number.isInteger(id) || id <= 0) {
-		throw new ValidationError('Character ID must be a positive integer')
-	}
+	// Validate input using helper function
+	validatePositiveIntegerId(id, 'Character ID', true)
 
 	try {
 		await prisma.$transaction(async (tx) => {
